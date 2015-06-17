@@ -1,0 +1,17 @@
+{
+    "name": "xemlock/wp-post-attachments",
+    "description": "",
+    "authors": [
+        {
+            "name": "xemlock",
+            "email": "xemlock@gmail.com"
+        }
+    ],
+    "require": {
+    },
+    "autoload": {
+        "files": [
+            "bootstrap.php"
+        ]
+    }
+}
