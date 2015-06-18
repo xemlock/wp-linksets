@@ -18,7 +18,7 @@ class wpPostAttachments
     public function add_meta_boxes()
     {
         foreach ($this->_post_types as $post_type) {
-            add_meta_box('links', 'Odnośniki', array($this, 'render_metabox'), $post_type, 'normal', 'default', null);
+            add_meta_box('post_attachments', 'Post attachments', array($this, 'render_metabox'), $post_type, 'normal', 'default', null);
         }
     }
 
@@ -28,23 +28,25 @@ class wpPostAttachments
 
         if ($post && in_array($post->post_type, $this->_post_types) && isset($_REQUEST['post_attachments'])) {
 
-            $linkset = array();
-            foreach ((array) $_REQUEST['linkset'] as $link) {
+            $attachments = array();
+            foreach ((array) $_REQUEST['post_attachments'] as $link) {
                 $link = (array) $link;
-                $linkset[] = array(
-                    'url'   => (string) @$link['url'],
-                    'title' => (string) @$link['title'],
-                    'thumb' => (int) @$link['thumb'],
-                );
+                $attachments[] = array(
+                    'url'         => (string) @$link['url'],
+                    'title'       => (string) @$link['title'],
+                    'date'        => (int) strtotime(@$link['date']),
+                    'description' => (string) @$link['description'],
+                    'thumbnail'   => (int) @$link['thumbnail'],
+                 );
             }
-            update_post_meta($post_id, '_linkset', self::serialize($linkset));
+            update_post_meta($post_id, '_post_attachments', wp_json_encode($attachments));
         }
     }
 
     public function the_post(WP_Post $post)
     {
         if (in_array($post->post_type, self::$post_types)) {
-            $post->attachments = self::get_linkset($post);
+            $post->post_attachments = self::get_linkset($post);
         }
     }
 
@@ -58,11 +60,11 @@ class wpPostAttachments
     protected static $_instance;
 
     /**
-     * Retrieves the globally accesible plugin instance.
+     * Retrieves the globally accessible plugin instance.
      *
      * @return wpPostAttachments
      */
-    public static function getInstance()
+    public static function get_instance()
     {
         if (empty(self::$_instance)) {
             self::$_instance = new self();
