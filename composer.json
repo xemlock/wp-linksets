@@ -1,6 +1,7 @@
 {
     "name": "xemlock/wp-post-attachments",
     "description": "",
+    "license": "MIT",
     "authors": [
         {
             "name": "xemlock",
@@ -10,6 +11,9 @@
     "require": {
     },
     "autoload": {
+        "psr-0": {
+            "wpPostAttachments": "lib/"
+        },
         "files": [
             "bootstrap.php"
         ]
