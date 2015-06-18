@@ -74,7 +74,7 @@ class wpPostAttachments
      */
     public function the_post(WP_Post $post)
     {
-        if (in_array($post->post_type, self::$post_types)) {
+        if (in_array($post->post_type, $this->_post_types)) {
             $post->post_attachments = get_post_attachments($post->ID);
         }
     }
@@ -86,7 +86,30 @@ class wpPostAttachments
     public function get_post_attachments($post_id)
     {
         $meta = get_post_meta((int) $post_id, self::POST_META_KEY, true);
+    }
 
+    /**
+     * @param $type
+     * @return wpPostAttachments_Attachment|null
+     */
+    public function create_attachment($type)
+    {
+        switch ($type) {
+            case 'link':
+                break;
+
+            case 'file':
+                break;
+
+            case 'audio':
+                break;
+
+            case 'youtube':
+                break;
+
+            default:
+                return null;
+        }
     }
 
     /**
