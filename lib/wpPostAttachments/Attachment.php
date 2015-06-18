@@ -125,6 +125,26 @@ abstract class wpPostAttachments_Attachment
         return $this->_image;
     }
 
+    public function set_from_array(array $data)
+    {
+        foreach ($data as $key => $value) {
+            if (method_exists($this, $method = 'set_' . $key)) {
+                $this->$method($value);
+            }
+        }
+    }
+
+    public function to_array()
+    {
+        return array(
+            'title' => $this->get_title(),
+            'date'  => $this->get_date(),
+            'author' => $this->get_author(),
+            'description' => $this->get_description(),
+            'thumbnail' => $this->get_image(),
+        );
+    }
+
     /**
      * @param string $key
      * @return mixed

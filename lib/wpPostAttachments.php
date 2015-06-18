@@ -53,16 +53,10 @@ class wpPostAttachments
         if ($post && in_array($post->post_type, $this->_post_types) && isset($_REQUEST[self::REQUEST_KEY])) {
 
             $attachments = array();
-            foreach ((array) $_REQUEST[self::REQUEST_KEY] as $link) {
-                $link = (array) $link;
-                $attachments[] = array(
-                    'url'         => (string) @$link['url'],
-                    'author'      => (string) @$link['author'],
-                    'date'        => (int) strtotime(@$link['date']),
-                    'title'       => (string) @$link['title'],
-                    'description' => (string) @$link['description'],
-                    'thumbnail'   => (int) @$link['thumbnail'],
-                 );
+            foreach ((array) $_REQUEST[self::REQUEST_KEY] as $data) {
+                if (isset($data['type']) && ($attachment = $this->create_attachment($data['type']))) {
+                    $attachments[] = $attachment->to_array();
+                }
             }
             update_post_meta($post_id, self::POST_META_KEY, wp_json_encode($attachments));
         }
@@ -75,7 +69,7 @@ class wpPostAttachments
     public function the_post(WP_Post $post)
     {
         if (in_array($post->post_type, $this->_post_types)) {
-            $post->post_attachments = get_post_attachments($post->ID);
+            $post->post_attachments = $this->get_post_attachments($post->ID);
         }
     }
 
@@ -92,7 +86,7 @@ class wpPostAttachments
      * @param $type
      * @return wpPostAttachments_Attachment|null
      */
-    public function create_attachment($type)
+    public function create_attachment($type, array $data = null)
     {
         switch ($type) {
             case 'link':
@@ -110,6 +104,15 @@ class wpPostAttachments
             default:
                 return null;
         }
+
+        $data = array(
+            'url'         => (string) @$data['url'],
+            'author'      => (string) @$data['author'],
+            'date'        => (int) strtotime(@$data['date']),
+            'title'       => (string) @$data['title'],
+            'description' => (string) @$data['description'],
+            'thumbnail'   => (int) @$data['thumbnail'],
+        );
     }
 
     /**
