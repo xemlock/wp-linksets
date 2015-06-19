@@ -1,6 +1,8 @@
 <?php
 
-class wpPostAttachments
+namespace wpPostAttachments;
+
+class Plugin
 {
     const REQUEST_KEY   = 'post_attachments';
     const POST_PROPERTY = 'post_attachments';
@@ -13,10 +15,10 @@ class wpPostAttachments
     public function __construct()
     {
         // register type handlers
-        $this->_type_classes['link'] = 'wpPostAttachments_Attachment_Link';
-        $this->_type_classes['file'] = 'wpPostAttachments_Attachment_File';
-        $this->_type_classes['audio'] = 'wpPostAttachments_Attachment_Audio';
-        $this->_type_classes['youtube'] = 'wpPostAttachments_Attachment_Youtube';
+        $this->_type_classes['link'] = 'wpPostAttachments\\Attachment\\Link';
+        $this->_type_classes['file'] = 'wpPostAttachments\\Attachment\\File';
+        $this->_type_classes['audio'] = 'wpPostAttachments\\Attachment\\Audio';
+        $this->_type_classes['youtube'] = 'wpPostAttachments\\Attachment\\Youtube';
 
 
         add_action('add_meta_boxes', array($this, 'add_meta_boxes'));

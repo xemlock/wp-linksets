@@ -1,6 +1,8 @@
 <?php
 
-class wpPostAttachments_Attachment_Youtube extends wpPostAttachments_Attachment_Abstract
+namespace wpPostAttachments\Attachment;
+
+class Youtube extends Base
 {
     /**
      * Youtube Video ID

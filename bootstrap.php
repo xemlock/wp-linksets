@@ -6,4 +6,4 @@ if (file_exists($autoload = dirname(__FILE__) . '/vendor/autoload.php')) {
     require_once $autoload;
 }
 
-wpPostAttachments::get_instance();
+wpPostAttachments\Plugin::get_instance();

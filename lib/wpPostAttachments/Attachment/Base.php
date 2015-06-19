@@ -1,6 +1,8 @@
 <?php
 
-abstract class wpPostAttachments_Attachment_Abstract
+namespace wpPostAttachments\Attachment;
+
+abstract class Base
 {
     /**
      * @var string
@@ -99,7 +101,7 @@ abstract class wpPostAttachments_Attachment_Abstract
      */
     public function set_author_id($author_id)
     {
-        if ($author_id instanceof WP_User) {
+        if ($author_id instanceof \WP_User) {
             $author_id = $author_id->ID;
         }
         $this->_author_id = (int) $author_id;
@@ -121,7 +123,7 @@ abstract class wpPostAttachments_Attachment_Abstract
      */
     public function set_thumb_id($thumb_id)
     {
-        if ($thumb_id instanceof WP_Post) {
+        if ($thumb_id instanceof \WP_Post) {
             $thumb_id = $thumb_id->ID;
         }
         $this->_thumb_id = (int) $thumb_id;

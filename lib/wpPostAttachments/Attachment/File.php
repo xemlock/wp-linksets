@@ -1,6 +1,8 @@
 <?php
 
-class wpPostAttachments_Attachment_File extends wpPostAttachments_Attachment_Abstract
+namespace wpPostAttachments\Attachment;
+
+class File extends Base
 {
     protected $_file_id;
 
@@ -11,7 +13,7 @@ class wpPostAttachments_Attachment_File extends wpPostAttachments_Attachment_Abs
 
     public function set_file_id($file_id)
     {
-        if ($file_id instanceof WP_Post) {
+        if ($file_id instanceof \WP_Post) {
             $file_id = $file_id->ID;
         }
         $this->_file_id = (int) $file_id;

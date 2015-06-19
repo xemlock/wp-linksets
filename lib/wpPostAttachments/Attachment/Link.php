@@ -1,6 +1,8 @@
 <?php
 
-class wpPostAttachments_Attachment_Link extends wpPostAttachments_Attachment_Abstract
+namespace wpPostAttachments\Attachment;
+
+class Link extends Base
 {
     protected $_url;
 
