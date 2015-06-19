@@ -2,7 +2,7 @@
 
 namespace wpPostAttachments\Attachment;
 
-class Link extends Base
+class Link extends Attachment
 {
     protected $_url;
 

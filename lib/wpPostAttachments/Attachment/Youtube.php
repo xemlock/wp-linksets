@@ -2,7 +2,7 @@
 
 namespace wpPostAttachments\Attachment;
 
-class Youtube extends Base
+class Youtube extends Attachment
 {
     /**
      * Youtube Video ID

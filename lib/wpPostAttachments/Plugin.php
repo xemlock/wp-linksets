@@ -61,14 +61,14 @@ class Plugin
         }
     }
 
-    public function render_metabox(WP_Post $post)
+    public function render_metabox(\WP_Post $post)
     {
         echo '<input type="hidden" name="custom_meta_box_nonce" value="', wp_create_nonce(basename(__FILE__)), '" />';
         echo '<input type="text" name="post_attachments[]" />';
     }
 
     /**
-     * @param $post_id
+     * @param int $post_id
      * @internal
      */
     public function save_post($post_id)
@@ -115,7 +115,7 @@ class Plugin
     }
 
     /**
-     * @param wpPostAttachments_Attachment_Abstract $attachment
+     * @param wpPostAttachments\Attachment\Base $attachment
      * @return array
      * @internal
      */
@@ -125,10 +125,10 @@ class Plugin
     }
 
     /**
-     * @param WP_Post $post
+     * @param \WP_Post $post
      * @internal
      */
-    public function the_post(WP_Post $post)
+    public function the_post(\WP_Post $post)
     {
         if (in_array($post->post_type, $this->_post_types)) {
             $post->{self::POST_PROPERTY} = $this->get_post_attachments($post->ID);
@@ -137,7 +137,7 @@ class Plugin
 
     /**
      * @param int|WP_Post $post_id
-     * @return wpPostAttachments_Attachment[]
+     * @return wpPostAttachments\Attachment[]
      */
     public function get_post_attachments($post_id)
     {
@@ -159,7 +159,7 @@ class Plugin
 
     /**
      * @param $type
-     * @return wpPostAttachments_Attachment|null
+     * @return wpPostAttachments\Attachment|null
      */
     public function create_attachment($type, array $data = null)
     {
@@ -171,14 +171,14 @@ class Plugin
     }
 
     /**
-     * @var wpPostAttachments
+     * @var wpPostAttachments\Plugin
      */
     protected static $_instance;
 
     /**
      * Retrieves the globally accessible plugin instance.
      *
-     * @return wpPostAttachments
+     * @return wpPostAttachments\Plugin
      */
     public static function get_instance()
     {

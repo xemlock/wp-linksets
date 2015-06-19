@@ -2,7 +2,7 @@
 
 namespace wpPostAttachments\Attachment;
 
-abstract class Base
+abstract class Attachment
 {
     /**
      * @var string
@@ -97,7 +97,7 @@ abstract class Base
     }
 
     /**
-     * @param int|WP_User $user
+     * @param int|\WP_User $user
      */
     public function set_author_id($author_id)
     {

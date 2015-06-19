@@ -2,7 +2,7 @@
 
 namespace wpPostAttachments\Attachment;
 
-class File extends Base
+class File extends Attachment
 {
     protected $_file_id;
 
