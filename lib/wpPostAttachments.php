@@ -12,26 +12,32 @@ class wpPostAttachments
 
     public function __construct()
     {
-        add_action('add_meta_boxes', array($this, 'add_meta_boxes'));
-        add_action('the_post', array($this, 'the_post'));
-
-        // these are not called if base post fields are not changed
-        add_action('save_post', array($this, 'save_post'));
-        // add_action('pre_post_update', array($this, 'save_post'));
-        // add_action('edit_attachment', array($this, 'save_post'));
-        // add_action('add_attachment', array($this, 'save_post'));
-
-        // in order to save post its content must not be considered empty
-        add_filter('wp_insert_post_empty_content', array($this, '_is_post_content_empty'));
-
+        // register type handlers
         $this->_type_classes['link'] = 'wpPostAttachments_Attachment_Link';
         $this->_type_classes['file'] = 'wpPostAttachments_Attachment_File';
         $this->_type_classes['audio'] = 'wpPostAttachments_Attachment_Audio';
         $this->_type_classes['youtube'] = 'wpPostAttachments_Attachment_Youtube';
+
+
+        add_action('add_meta_boxes', array($this, 'add_meta_boxes'));
+        add_action('the_post', array($this, 'the_post'));
+
+        // in order to save post its content must not be considered empty
+        // make sure post is not empty if attachments are provided in the request
+        add_filter('wp_insert_post_empty_content', array($this, '_is_post_content_empty'));
+
+        // these are not called if base post fields are not changed
+        add_action('save_post', array($this, 'save_post'));
+
+        // attachments use different hooks
+        add_action('edit_attachment', array($this, 'save_post'));
+        add_action('add_attachment', array($this, 'save_post'));
     }
 
     /**
      * Enables post attachment functionality for the given post type(s)
+     *
+     * This method must be explicitly called in the theme.
      *
      * @param string|array $post_type
      */
@@ -128,13 +134,18 @@ class wpPostAttachments
     }
 
     /**
-     * @param int $post_id
+     * @param int|WP_Post $post_id
      * @return wpPostAttachments_Attachment[]
      */
     public function get_post_attachments($post_id)
     {
+        if ($post_id instanceof WP_Post) {
+            $post_id = $post_id->ID;
+        }
+
         $meta = get_post_meta((int) $post_id, self::POST_META_KEY, true);
         $data = (array) json_decode($meta, true);
+
         $attachments = array();
         foreach ($data as $val) {
             if (isset($val['type']) && ($attachment = $this->create_attachment($val))) {

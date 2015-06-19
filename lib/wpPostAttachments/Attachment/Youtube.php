@@ -3,6 +3,7 @@
 class wpPostAttachments_Attachment_Youtube extends wpPostAttachments_Attachment_Abstract
 {
     /**
+     * Youtube Video ID
      * @var string
      */
     protected $_video_id;
