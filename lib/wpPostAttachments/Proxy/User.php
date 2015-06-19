@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * @deprecated
+ */
 class wpPostAttachments_Proxy_User extends wpPostAttachments_Proxy_Abstract
 {
     /**

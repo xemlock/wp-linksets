@@ -2,16 +2,32 @@
 
 class wpPostAttachments
 {
+    const REQUEST_KEY   = 'post_attachments';
+    const POST_PROPERTY = 'post_attachments';
     const POST_META_KEY = '_post_attachments';
-    const REQUEST_KEY = 'post_attachments';
 
     protected $_post_types = array();
+
+    protected $_type_classes = array();
 
     public function __construct()
     {
         add_action('add_meta_boxes', array($this, 'add_meta_boxes'));
-        add_action('save_post', array($this, 'save_post'));
         add_action('the_post', array($this, 'the_post'));
+
+        // these are not called if base post fields are not changed
+        add_action('save_post', array($this, 'save_post'));
+        // add_action('pre_post_update', array($this, 'save_post'));
+        // add_action('edit_attachment', array($this, 'save_post'));
+        // add_action('add_attachment', array($this, 'save_post'));
+
+        // in order to save post its content must not be considered empty
+        add_filter('wp_insert_post_empty_content', array($this, '_is_post_content_empty'));
+
+        $this->_type_classes['link'] = 'wpPostAttachments_Attachment_Link';
+        $this->_type_classes['file'] = 'wpPostAttachments_Attachment_File';
+        $this->_type_classes['audio'] = 'wpPostAttachments_Attachment_Audio';
+        $this->_type_classes['youtube'] = 'wpPostAttachments_Attachment_Youtube';
     }
 
     /**
@@ -39,7 +55,8 @@ class wpPostAttachments
 
     public function render_metabox(WP_Post $post)
     {
-        echo 123;
+        echo '<input type="hidden" name="custom_meta_box_nonce" value="', wp_create_nonce(basename(__FILE__)), '" />';
+        echo '<input type="text" name="post_attachments[]" />';
     }
 
     /**
@@ -48,18 +65,55 @@ class wpPostAttachments
      */
     public function save_post($post_id)
     {
+        // Don't update metadata when auto saving post
+        // http://wordpress.stackexchange.com/questions/14282/custom-post-type-metabox-not-saving
+        if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
+            return $post_id;
+        }
+
+        // if ( !wp_verify_nonce( $_POST['blc_noncename'], plugin_basename(__FILE__) )) {
+        //  return $post_id;
+        // }
+
         $post = get_post($post_id);
 
         if ($post && in_array($post->post_type, $this->_post_types) && isset($_REQUEST[self::REQUEST_KEY])) {
-
             $attachments = array();
             foreach ((array) $_REQUEST[self::REQUEST_KEY] as $data) {
                 if (isset($data['type']) && ($attachment = $this->create_attachment($data['type']))) {
-                    $attachments[] = $attachment->to_array();
+                    $attachments[] = $attachment;
                 }
             }
-            update_post_meta($post_id, self::POST_META_KEY, wp_json_encode($attachments));
+            update_post_meta($post_id, self::POST_META_KEY, wp_json_encode(
+                array_map(array($this, '_attachment_to_array'), $attachments)
+            ));
+            $post->{self::POST_PROPERTY} = $attachments;
         }
+
+        // echo '<pre>', __METHOD__, "\n", print_r($post, 1);exit;
+    }
+
+    /**
+     * @param bool $is_empty
+     * @return bool
+     * @internal
+     */
+    public function _is_post_content_empty($is_empty)
+    {
+        if (isset($_REQUEST[self::REQUEST_KEY])) {
+            return false;
+        }
+        return $is_empty;
+    }
+
+    /**
+     * @param wpPostAttachments_Attachment_Abstract $attachment
+     * @return array
+     * @internal
+     */
+    public function _attachment_to_array(wpPostAttachments_Attachment_Abstract $attachment)
+    {
+        return $attachment->to_array();
     }
 
     /**
@@ -69,17 +123,25 @@ class wpPostAttachments
     public function the_post(WP_Post $post)
     {
         if (in_array($post->post_type, $this->_post_types)) {
-            $post->post_attachments = $this->get_post_attachments($post->ID);
+            $post->{self::POST_PROPERTY} = $this->get_post_attachments($post->ID);
         }
     }
 
     /**
      * @param int $post_id
-     * @return array
+     * @return wpPostAttachments_Attachment[]
      */
     public function get_post_attachments($post_id)
     {
         $meta = get_post_meta((int) $post_id, self::POST_META_KEY, true);
+        $data = (array) json_decode($meta, true);
+        $attachments = array();
+        foreach ($data as $val) {
+            if (isset($val['type']) && ($attachment = $this->create_attachment($val))) {
+                $attachments[] = $attachment;
+            }
+        }
+        return $attachments;
     }
 
     /**
@@ -88,31 +150,11 @@ class wpPostAttachments
      */
     public function create_attachment($type, array $data = null)
     {
-        switch ($type) {
-            case 'link':
-                break;
-
-            case 'file':
-                break;
-
-            case 'audio':
-                break;
-
-            case 'youtube':
-                break;
-
-            default:
-                return null;
+        if (isset($this->_type_classes[$type])) {
+            $class = $this->_type_classes[$type];
+            return new $class($data);
         }
-
-        $data = array(
-            'url'         => (string) @$data['url'],
-            'author'      => (string) @$data['author'],
-            'date'        => (int) strtotime(@$data['date']),
-            'title'       => (string) @$data['title'],
-            'description' => (string) @$data['description'],
-            'thumbnail'   => (int) @$data['thumbnail'],
-        );
+        return null;
     }
 
     /**

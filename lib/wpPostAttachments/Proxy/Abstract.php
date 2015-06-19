@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * @deprecated
+ */
 abstract class wpPostAttachments_Proxy_Abstract
 {
     /**
