@@ -51,6 +51,11 @@ class Plugin
         }
     }
 
+    public function get_post_types()
+    {
+        return $this->_post_types;
+    }
+
     /**
      * @internal
      */

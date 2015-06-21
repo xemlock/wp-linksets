@@ -30,7 +30,7 @@ selectFile = (onSelect, options) ->
     frame.open()
 
 renderAttachment = (type, data) ->
-    li = $ '<li/>'
+    li = $ '<li class="wppa-link" />'
     li.append render(type, data)
     li.appendTo '#wpPostAttachments-list'
     return
@@ -55,11 +55,10 @@ createYoutubeFields = () ->
 # type is optional
 attachFile = (type) ->
     selectFile (selected) ->
-        if selected.length == 0
-            return
-
-        createFileFields type, selected[0]
-    , {type: type}
+        # create box for each selected file
+        _.each selected, (file) ->
+            createFileFields type, file
+    , {type: type, multiple: yes}
 
 attachYoutube = ->
     createYoutubeFields()
@@ -113,15 +112,50 @@ $ ->
     $('#post-attachments-metabox')
         .on 'click', '[data-action="attach-link"]', ->
             attachLink()
+            return false
 
         .on 'click', '[data-action="attach-file"]', ->
             attachFile()
+            return false
 
         .on 'click', '[data-action="attach-audio"]', ->
             attachFile 'audio'
+            return false
 
         .on 'click', '[data-action="attach-youtube"]', ->
             attachYoutube()
+            return false
+
+        .on 'click', '[data-action="attachment-delete"]', ->
+            li = $(this).closest('li')
+            li2 = $ '<li class="wppa-link" />'
+
+            tpl = wp.template "wpPostAttachments-undo"
+            li2.append tpl()
+
+            li2.outerWidth li.outerWidth()
+            li2.outerHeight li.outerHeight()
+            li.replaceWith li2
+
+            li2.data 'origLI', li
+
+            return false
+
+        .on 'click', '[data-action="delete-undo"]', ->
+            li = $(this).closest('li')
+            li.replaceWith li.data('origLI')
+            li.remove()
+            return false
+
+        .on 'click', '[data-action="delete-confirm"]', ->
+            li = $(this).closest('li')
+            li.animate
+                height: 0
+                opacity: 0
+            , -> $(this).remove()
+            return false
+
+
 
     $('#wpPostAttachments-list').sortable()
 

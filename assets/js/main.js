@@ -38,7 +38,7 @@
 
   renderAttachment = function(type, data) {
     var li;
-    li = $('<li/>');
+    li = $('<li class="wppa-link" />');
     li.append(render(type, data));
     li.appendTo('#wpPostAttachments-list');
   };
@@ -65,12 +65,12 @@
 
   attachFile = function(type) {
     return selectFile(function(selected) {
-      if (selected.length === 0) {
-        return;
-      }
-      return createFileFields(type, selected[0]);
+      return _.each(selected, function(file) {
+        return createFileFields(type, file);
+      });
     }, {
-      type: type
+      type: type,
+      multiple: true
     });
   };
 
@@ -129,13 +129,44 @@
       return renderAttachment(attachment.type, attachment);
     });
     $('#post-attachments-metabox').on('click', '[data-action="attach-link"]', function() {
-      return attachLink();
+      attachLink();
+      return false;
     }).on('click', '[data-action="attach-file"]', function() {
-      return attachFile();
+      attachFile();
+      return false;
     }).on('click', '[data-action="attach-audio"]', function() {
-      return attachFile('audio');
+      attachFile('audio');
+      return false;
     }).on('click', '[data-action="attach-youtube"]', function() {
-      return attachYoutube();
+      attachYoutube();
+      return false;
+    }).on('click', '[data-action="attachment-delete"]', function() {
+      var li, li2, tpl;
+      li = $(this).closest('li');
+      li2 = $('<li class="wppa-link" />');
+      tpl = wp.template("wpPostAttachments-undo");
+      li2.append(tpl());
+      li2.outerWidth(li.outerWidth());
+      li2.outerHeight(li.outerHeight());
+      li.replaceWith(li2);
+      li2.data('origLI', li);
+      return false;
+    }).on('click', '[data-action="delete-undo"]', function() {
+      var li;
+      li = $(this).closest('li');
+      li.replaceWith(li.data('origLI'));
+      li.remove();
+      return false;
+    }).on('click', '[data-action="delete-confirm"]', function() {
+      var li;
+      li = $(this).closest('li');
+      li.animate({
+        height: 0,
+        opacity: 0
+      }, function() {
+        return $(this).remove();
+      });
+      return false;
     });
     $('#wpPostAttachments-list').sortable();
   });

@@ -1,16 +1,30 @@
 <?php defined('ABSPATH') || die(); ?>
 <?php /** @var \wpPostAttachments\Plugin $this */ ?>
 
-<link href="<?php echo $this->get_plugin_url('assets/vendor/font-awesome/css/font-awesome.min.css') ?>" rel="stylesheet" type="text/css" />
+<style>
+.wppa-link {
+    padding: 10px;
+}
+.wppa-link + .wppa-link {
+    border-top: 1px solid #ccc;
+}
+.wppa-link.ui-sortable-helper {
+    border-top: none;
+}
+.wppa-url {
 
-<!--<script>window.angular||document.write('<script src="<?php echo $this->get_plugin_url('assets/vendor/angular/angular.min.js') ?>"><\/script>')</script>-->
+}
+#wpPostAttachments-buttons {
+    background: #eee;
+    padding: 10px;
+}
+
+</style>
+
+<link href="<?php echo $this->get_plugin_url('assets/vendor/font-awesome/css/font-awesome.min.css') ?>" rel="stylesheet" type="text/css" />
 <script><?php require $this->get_plugin_path('assets/js/main.js') ?></script>
 
-<h2><?php echo $this->get_plugin_url() ?></h2>
-
 <input type="hidden" name="custom_meta_box_nonce" value="<?php echo wp_create_nonce(basename(__FILE__)) ?>" />
-<input type="text" name="post_attachments[]" />
-
 
 <div id="post-attachments-metabox">
     Javascript is required for post attachments functionality
@@ -38,6 +52,7 @@
         <input type="text" name="title" value="{{ data.title }}" />
         <input type="text" name="date" value="{{ data.value }}" placeholder="YYYY-MM-DD HH:MM" />
         <textarea name="description">{{ data.description }}</textarea>
+        <button type="button" data-action="attachment-delete"><i class="fa fa-times"></i></button>
     </div>
 </script>
 
@@ -49,6 +64,7 @@
         <input type="text" name="title" value="{{ data.title }}" />
         <input type="text" name="date" value="{{ data.value }}" placeholder="YYYY-MM-DD HH:MM" />
         <textarea name="description">{{ data.description }}</textarea>
+        <button type="button" data-action="attachment-delete"><i class="fa fa-times"></i></button>
     </div>
 </script>
 
@@ -60,6 +76,7 @@
         <input type="text" name="title" value="{{ data.title }}" />
         <input type="text" name="date" value="{{ data.value }}" placeholder="YYYY-MM-DD HH:MM" />
         <textarea name="description">{{ data.description }}</textarea>
+        <button type="button" data-action="attachment-delete"><i class="fa fa-times"></i></button>
     </div>
 </script>
 
@@ -72,6 +89,14 @@
         <input type="text" name="title" value="{{ data.title }}" />
         <input type="text" name="date" value="{{ data.value }}" placeholder="YYYY-MM-DD HH:MM" />
         <textarea name="description">{{ data.description }}</textarea>
+        <button type="button" data-action="attachment-delete"><i class="fa fa-times"></i></button>
     </div>
 </script>
 
+<script type="text/html" id="tmpl-wpPostAttachments-undo">
+    <div>
+        Attachment deleted
+        <button type="button" data-action="delete-undo"><i class="fa fa-undo"></i> Undo</button>
+        <button type="button" data-action="delete-confirm"><i class="fa fa-times"></i> Dismiss</button>
+    </div>
+</script>
