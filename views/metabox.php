@@ -21,15 +21,7 @@
 </script>
 
 <script type="text/html" id="tmpl-wpPostAttachments-main">
-    <ul id="wpPostAttachments-list">
-    <# _.each(data.attachments, function (attachment) { #>
-        <# console.log (attachment) #>
-    <li>
-        {{{ data.renderString(attachment.type, attachment) }}}
-    </li>
-        <# console.log ('ok') #>
-    <# }) #>
-    </ul>
+    <ul id="wpPostAttachments-list"></ul>
     <div id="wpPostAttachments-buttons">
         <button type="button" data-action="attach-link"><i class="fa fa-lg fa-link"></i> Link</button>
         <button type="button" data-action="attach-file"><i class="fa fa-lg fa-file-text"></i> File</button>

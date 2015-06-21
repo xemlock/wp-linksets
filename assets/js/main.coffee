@@ -29,28 +29,27 @@ selectFile = (onSelect, options) ->
 
     frame.open()
 
+renderAttachment = (type, data) ->
+    li = $ '<li/>'
+    li.append render(type, data)
+    li.appendTo '#wpPostAttachments-list'
+    return
+
 createLinkFields = () ->
-    $('#wpPostAttachments-list').append(
-        $('<li/>').html render('link')
-    )
+    renderAttachment 'link'
     return
 
 createFileFields = (type, file) ->
-    console?.log file
-    $('#wpPostAttachments-list').append(
-        $('<li/>').html render(type,
-            file: file
-            file_id: file.id
-            title: file.title
-            description: file.description
-        )
-    )
+    console?.log type, file
+    renderAttachment type ? 'file',
+        file: file
+        file_id: file.id
+        title: file.title
+        description: file.description
     return
 
 createYoutubeFields = () ->
-    $('#wpPostAttachments-list').append(
-        $('<li/>').html render('youtube')
-    )
+    renderAttachment 'youtube'
     return
 
 # type is optional
@@ -104,8 +103,12 @@ $ ->
     $('#post-attachments-metabox').html (template {
         render: render
         renderString: renderString
-        attachments: window.postAttachments
     })
+
+    console?.log window.postAttachments
+
+    _.each window.postAttachments, (attachment) ->
+        renderAttachment attachment.type, attachment
 
     $('#post-attachments-metabox')
         .on 'click', '[data-action="attach-link"]', ->
