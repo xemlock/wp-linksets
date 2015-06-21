@@ -82,6 +82,7 @@ abstract class Attachment
     public function set_date($date)
     {
         $date = is_int($date) || is_float($date) ? $date : strtotime($date);
+        $data = $date === false ? time() : $date;
         $this->_date = date('Y-m-d H:i:s', $date);
     }
 
@@ -176,7 +177,7 @@ abstract class Attachment
             'description' => $this->get_description(),
             'date'        => $this->get_date(),
             'author_id'   => $this->get_author_id(),
-            'thumb_id'    => $this->get_image(),
+            'thumb_id'    => $this->get_thumb_id(),
         );
     }
 

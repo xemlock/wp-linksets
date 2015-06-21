@@ -15,10 +15,10 @@ class Plugin
     public function __construct()
     {
         // register type handlers
-        $this->_type_classes['link'] = 'wpPostAttachments\\Attachment\\Link';
-        $this->_type_classes['file'] = 'wpPostAttachments\\Attachment\\File';
-        $this->_type_classes['audio'] = 'wpPostAttachments\\Attachment\\Audio';
-        $this->_type_classes['youtube'] = 'wpPostAttachments\\Attachment\\Youtube';
+        $this->_type_classes['link'] = '\\wpPostAttachments\\Attachment\\Link';
+        $this->_type_classes['file'] = '\\wpPostAttachments\\Attachment\\File';
+        $this->_type_classes['audio'] = '\\wpPostAttachments\\Attachment\\Audio';
+        $this->_type_classes['youtube'] = '\\wpPostAttachments\\Attachment\\Youtube';
 
 
         add_action('add_meta_boxes', array($this, 'add_meta_boxes'));
@@ -63,8 +63,7 @@ class Plugin
 
     public function render_metabox(\WP_Post $post)
     {
-        echo '<input type="hidden" name="custom_meta_box_nonce" value="', wp_create_nonce(basename(__FILE__)), '" />';
-        echo '<input type="text" name="post_attachments[]" />';
+        require $this->get_plugin_path() . '/views/metabox.php';
     }
 
     /**
@@ -85,20 +84,24 @@ class Plugin
 
         $post = get_post($post_id);
 
-        if ($post && in_array($post->post_type, $this->_post_types) && isset($_REQUEST[self::REQUEST_KEY])) {
+        if ($post && in_array($post->post_type, $this->_post_types) && isset($_POST[self::REQUEST_KEY])) {
             $attachments = array();
-            foreach ((array) $_REQUEST[self::REQUEST_KEY] as $data) {
-                if (isset($data['type']) && ($attachment = $this->create_attachment($data['type']))) {
+            foreach ((array) $_POST[self::REQUEST_KEY] as $data) {
+                if (($attachment = $this->create_attachment($data)) !== null) {
                     $attachments[] = $attachment;
                 }
             }
-            update_post_meta($post_id, self::POST_META_KEY, wp_json_encode(
+
+            $meta = wp_json_encode(
                 array_map(array($this, '_attachment_to_array'), $attachments)
-            ));
+            );
+            update_post_meta($post_id, self::POST_META_KEY, $meta);
+
             $post->{self::POST_PROPERTY} = $attachments;
         }
 
-        // echo '<pre>', __METHOD__, "\n", print_r($post, 1);exit;
+        // echo @$meta;
+        // echo '<pre>', __METHOD__, "\n", print_r($post, 1); print_r($_POST); exit;
     }
 
     /**
@@ -108,18 +111,18 @@ class Plugin
      */
     public function _is_post_content_empty($is_empty)
     {
-        if (isset($_REQUEST[self::REQUEST_KEY])) {
+        if (isset($_POST[self::REQUEST_KEY])) {
             return false;
         }
         return $is_empty;
     }
 
     /**
-     * @param wpPostAttachments\Attachment\Base $attachment
+     * @param \wpPostAttachments\Attachment\Attachment $attachment
      * @return array
      * @internal
      */
-    public function _attachment_to_array(wpPostAttachments_Attachment_Abstract $attachment)
+    public function _attachment_to_array(\wpPostAttachments\Attachment\Attachment $attachment)
     {
         return $attachment->to_array();
     }
@@ -136,12 +139,16 @@ class Plugin
     }
 
     /**
-     * @param int|WP_Post $post_id
-     * @return wpPostAttachments\Attachment[]
+     * @param int|WP_Post $post_id OPTIONAL
+     * @return \wpPostAttachments\Attachment\Attachment[]
      */
-    public function get_post_attachments($post_id)
+    public function get_post_attachments($post_id = null)
     {
-        if ($post_id instanceof WP_Post) {
+        if ($post_id === null) {
+            $post_id = get_post();
+        }
+
+        if ($post_id instanceof \WP_Post) {
             $post_id = $post_id->ID;
         }
 
@@ -150,7 +157,7 @@ class Plugin
 
         $attachments = array();
         foreach ($data as $val) {
-            if (isset($val['type']) && ($attachment = $this->create_attachment($val))) {
+            if (($attachment = $this->create_attachment($val)) !== null) {
                 $attachments[] = $attachment;
             }
         }
@@ -158,27 +165,89 @@ class Plugin
     }
 
     /**
-     * @param $type
-     * @return wpPostAttachments\Attachment|null
+     * @param string|array $type
+     * @return \wpPostAttachments\Attachment\Attachment|null
      */
-    public function create_attachment($type, array $data = null)
+    public function create_attachment($type)
     {
+        if (is_array($type)) {
+            $data = $type;
+            $type = (string) $data['type'];
+        } else {
+            $data = null;
+            $type = (string) $type;
+        }
+
         if (isset($this->_type_classes[$type])) {
             $class = $this->_type_classes[$type];
-            return new $class($data);
+            /** @var \wpPostAttachments\Attachment\Attachment $attachment */
+            $attachment = new $class();
+            if ($data) {
+                $attachment->set_from_array($data);
+            }
+            return $attachment;
         }
+
         return null;
     }
 
+    public function get_plugin_url($path = null)
+    {
+        static $plugin_url;
+        if ($plugin_url === null) {
+            // get url corresponding to wp-content directory
+            $content_url = content_url();
+
+            // get wp-content dir name (defaults to wp-content)
+            $content_dir = basename($content_url);
+
+            // find the last occurrence of wp-content in the path of the
+            // directory of the plugin - we require that it resides inside
+            // wp-content subtree
+            $dir = wp_normalize_path($this->get_plugin_path());
+            if (($pos = strrpos($dir, '/' . $content_dir . '/')) !== false) {
+                // replace path to wp-content with the wp-content url
+                $plugin_url = $content_url . substr($dir, $pos + strlen($content_dir) + 1);
+            } else {
+                throw new Exception('Unable to determine plugin url');
+            }
+        }
+        if ($path === null) {
+            $path = $plugin_url;
+        } else {
+            $path = $plugin_url . '/' . ltrim($path, '/');
+        }
+        return $path;
+    }
+
     /**
-     * @var wpPostAttachments\Plugin
+     * @param  string $path OPTIONAL
+     * @return string
+     */
+    public function get_plugin_path($path = null)
+    {
+        static $plugin_dir;
+        if ($plugin_dir === null) {
+            $plugin_dir = realpath(__DIR__ . '/../..');
+        }
+        if ($path === null) {
+            $path = $plugin_dir;
+        } else {
+            $path = $plugin_dir . DIRECTORY_SEPARATOR . ltrim($path, '/\\');
+        }
+        return $path;
+    }
+
+
+    /**
+     * @var \wpPostAttachments\Plugin
      */
     protected static $_instance;
 
     /**
      * Retrieves the globally accessible plugin instance.
      *
-     * @return wpPostAttachments\Plugin
+     * @return \wpPostAttachments\Plugin
      */
     public static function get_instance()
     {
