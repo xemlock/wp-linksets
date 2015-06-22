@@ -31,13 +31,14 @@ selectFile = (onSelect, options) ->
 
 renderAttachment = (type, data) ->
     li = $ '<li class="wppa-link" />'
-    li.append render(type, data)
     li.appendTo '#wpPostAttachments-list'
-    return
+    li.append (el = render(type, data))
+    console?.log 'trigger insert', el
+
+
 
 createLinkFields = () ->
     renderAttachment 'link'
-    return
 
 createFileFields = (type, file) ->
     console?.log type, file
@@ -46,11 +47,9 @@ createFileFields = (type, file) ->
         file_id: file.id
         title: file.title
         description: file.description
-    return
 
 createYoutubeFields = () ->
     renderAttachment 'youtube'
-    return
 
 # type is optional
 attachFile = (type) ->
@@ -61,7 +60,33 @@ attachFile = (type) ->
     , {type: type, multiple: yes}
 
 attachYoutube = ->
-    createYoutubeFields()
+    console?.log 'attachYoutube'
+
+    # load in background default thumbnail
+    el = createYoutubeFields()
+    # here el should be appended to DOM
+
+    model = el.find('[data-model="video_id"]')
+
+    loadDefaultThumb = ->
+        console?.log 'loadDefaultThumb', model.val()
+        # remove any previous image
+        el.find('img.default-thumb').remove()
+        i = new Image()
+        i.onload = ->
+            img = $ '<img class="default-thumb" />'
+            img.attr 'src', @src
+            img.prependTo el
+            @onload = null
+            return
+        i.src = "http://img.youtube.com/vi/#{ model.val() }/default.jpg"
+        return
+
+    model.change loadDefaultThumb
+    loadDefaultThumb()
+
+    return el
+
 
 attachLink = ->
     createLinkFields()
@@ -150,7 +175,7 @@ $ ->
         .on 'click', '[data-action="delete-confirm"]', ->
             li = $(this).closest('li')
             li.animate
-                height: 0
+                outerHeight: 0
                 opacity: 0
             , -> $(this).remove()
             return false

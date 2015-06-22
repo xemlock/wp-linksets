@@ -4,12 +4,14 @@
 <style>
 .wppa-link {
     padding: 10px;
+    background: #fff;
 }
 .wppa-link + .wppa-link {
     border-top: 1px solid #ccc;
 }
 .wppa-link.ui-sortable-helper {
     border-top: none;
+    box-shadow: 0 0 10px rgba(0, 0, 0, .15);
 }
 .wppa-url {
 
@@ -82,10 +84,9 @@
 
 <script type="text/html" id="tmpl-wpPostAttachments-youtube">
     <div>
-        <img src="http://img.youtube.com/vi/{{ data.video_id }}/default.jpg" />
         <span><i class="fa fa-youtube-play"></i> Youtube Video</span>
         <input type="hidden" name="type" value="youtube" />
-        <input type="text" name="video_id" value="{{ data.video_id }}" onchange="jQuery(this).parent().find('img').attr('src', 'http://img.youtube.com/vi/' + escape(this.value) + '/default.jpg')" />
+        <input type="text" name="video_id" value="{{ data.video_id }}" data-model="video_id" />
         <input type="text" name="title" value="{{ data.title }}" />
         <input type="text" name="date" value="{{ data.value }}" placeholder="YYYY-MM-DD HH:MM" />
         <textarea name="description">{{ data.description }}</textarea>
@@ -95,8 +96,8 @@
 
 <script type="text/html" id="tmpl-wpPostAttachments-undo">
     <div>
-        Attachment deleted
-        <button type="button" data-action="delete-undo"><i class="fa fa-undo"></i> Undo</button>
-        <button type="button" data-action="delete-confirm"><i class="fa fa-times"></i> Dismiss</button>
+        Link removed
+        <button type="button" data-action="delete-undo" title="Undo link removal"><i class="fa fa-undo"></i> Undo</button>
+        <button type="button" data-action="delete-confirm" title="Dismiss this notification"><i class="fa fa-times"></i></button>
     </div>
 </script>

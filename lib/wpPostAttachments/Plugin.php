@@ -8,32 +8,43 @@ class Plugin
     const POST_PROPERTY = 'post_attachments';
     const POST_META_KEY = '_post_attachments';
 
+    /**
+     * @var array
+     */
+    protected $_type_classes = array(
+        'link'    => '\\wpPostAttachments\\Attachment\\Link',
+        'file'    => '\\wpPostAttachments\\Attachment\\File',
+        'audio'   => '\\wpPostAttachments\\Attachment\\Audio',
+        'youtube' => '\\wpPostAttachments\\Attachment\\Youtube',
+    );
+
+    /**
+     * @var array
+     */
     protected $_post_types = array();
 
-    protected $_type_classes = array();
-
-    public function __construct()
+    public function init()
     {
-        // register type handlers
-        $this->_type_classes['link'] = '\\wpPostAttachments\\Attachment\\Link';
-        $this->_type_classes['file'] = '\\wpPostAttachments\\Attachment\\File';
-        $this->_type_classes['audio'] = '\\wpPostAttachments\\Attachment\\Audio';
-        $this->_type_classes['youtube'] = '\\wpPostAttachments\\Attachment\\Youtube';
+        static $initialized = false;
 
+        if (!$initialized) {
+            add_action('add_meta_boxes', array($this, 'add_meta_boxes'));
 
-        add_action('add_meta_boxes', array($this, 'add_meta_boxes'));
-        add_action('the_post', array($this, 'the_post'));
+            // in order to save post its content must not be considered empty
+            // make sure post is not empty if attachments are provided in the request
+            add_filter('wp_insert_post_empty_content', array($this, '_is_post_content_empty'));
 
-        // in order to save post its content must not be considered empty
-        // make sure post is not empty if attachments are provided in the request
-        add_filter('wp_insert_post_empty_content', array($this, '_is_post_content_empty'));
+            // these are not called if base post fields are not changed
+            add_action('save_post', array($this, 'save_post'));
 
-        // these are not called if base post fields are not changed
-        add_action('save_post', array($this, 'save_post'));
+            // attachments use different hooks
+            add_action('edit_attachment', array($this, 'save_post'));
+            add_action('add_attachment', array($this, 'save_post'));
 
-        // attachments use different hooks
-        add_action('edit_attachment', array($this, 'save_post'));
-        add_action('add_attachment', array($this, 'save_post'));
+            add_action('the_post', array($this, 'the_post'));
+
+            $initialized = true;
+        }
     }
 
     /**
@@ -196,6 +207,11 @@ class Plugin
         return null;
     }
 
+    /**
+     * @param string $path OPTIONAL
+     * @return string
+     * @throws Exception
+     */
     public function get_plugin_url($path = null)
     {
         static $plugin_url;
@@ -214,7 +230,7 @@ class Plugin
                 // replace path to wp-content with the wp-content url
                 $plugin_url = $content_url . substr($dir, $pos + strlen($content_dir) + 1);
             } else {
-                throw new Exception('Unable to determine plugin url');
+                throw new \RuntimeException('Unable to determine plugin url');
             }
         }
         if ($path === null) {
