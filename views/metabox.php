@@ -114,11 +114,13 @@
 </script>
 
 <script type="text/html" id="tmpl-wpPostAttachments-thumb">
-    <div class="wppl-thumb" style="border:1px solid #ccc;width:150px;">
+    <div class="wppl-thumb" style="border:1px solid #ccc;width:150px;height:150px;text-align:center;overflow:hidden;">
+        <div style="width:300px;height:100%;margin-left:-75px">
         <# if (data.thumb_url) { #>
-            <img src="{{ data.thumb_url }}" style="display:block;width:100%;" />
+            <img src="{{ data.thumb_url }}" style="height:100%;" />
         <# } else { #>
-            <img src="http://placehold.it/150x150" style="display:block;width:100%;height:100%;" />
+            <img src="http://placehold.it/150x150" style="height:100%;" />
         <# } #>
+        </div>
     </div>
 </script>

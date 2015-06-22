@@ -41,7 +41,12 @@ class Youtube extends Attachment
     {
         $thumb_url = parent::get_thumb_url($size);
         if ($thumb_url === false) {
-            $thumb_url = sprintf('http://img.youtube.com/vi/%s/default.jpg', urlencode($this->get_video_id()));
+            // sizes:
+            // - default (120x90px)
+            // - mqdefault (320x180px)
+            // - hqdefault (480x360px)
+            // - sddefault (640x480px)
+            $thumb_url = sprintf('http://img.youtube.com/vi/%s/hqdefault.jpg', urlencode($this->get_video_id()));
         }
         return $thumb_url;
     }
