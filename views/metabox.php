@@ -25,6 +25,7 @@
 
 <link href="<?php echo $this->get_plugin_url('assets/vendor/font-awesome/css/font-awesome.min.css') ?>" rel="stylesheet" type="text/css" />
 <script><?php require $this->get_plugin_path('assets/js/main.js') ?></script>
+<script>window.moment||document.write('<script src="<?php echo $this->get_plugin_url('assets/vendor/moment/min/moment.min.js') ?>"><\/script>')</script>
 
 <input type="hidden" name="custom_meta_box_nonce" value="<?php echo wp_create_nonce(basename(__FILE__)) ?>" />
 
@@ -33,7 +34,13 @@
 </div>
 
 <script>
-    window.postAttachments = <?php echo wp_json_encode(array_map(array($this, '_attachment_to_array'), $this->get_post_attachments())) ?>;
+    <?php
+        $post_attachments = array();
+        foreach ($this->get_post_attachments() as $attachment) {
+            $post_attachments[] = array_merge($attachment->to_array(), array('thumb_url' => $attachment->get_thumb_url('thumbnail')));
+        }
+    ?>
+    window.postAttachments = <?php echo wp_json_encode($post_attachments) ?>;
 </script>
 
 <script type="text/html" id="tmpl-wpPostAttachments-main">
@@ -48,6 +55,7 @@
 
 <script type="text/html" id="tmpl-wpPostAttachments-link">
     <div>
+        {{{ data.renderString('thumb', data) }}}
         <span><i class="fa fa-link"></i> Website link</span>
         <input type="hidden" name="type" value="link" />
         <input type="text" name="url" value="{{ data.url }}" placeholder="http://" />
@@ -60,6 +68,7 @@
 
 <script type="text/html" id="tmpl-wpPostAttachments-file">
     <div>
+        {{{ data.renderString('thumb', data) }}}
         <span><i class="fa fa-file-text"></i> File</span>
         <input type="hidden" name="type" value="file" />
         <input type="hidden" name="file_id" value="{{ data.file_id }}" />
@@ -72,6 +81,7 @@
 
 <script type="text/html" id="tmpl-wpPostAttachments-audio">
     <div>
+        {{{ data.renderString('thumb', data) }}}
         <span><i class="fa fa-volume-up"></i> Audio file</span>
         <input type="hidden" name="type" value="audio" />
         <input type="hidden" name="file_id" value="{{ data.file_id }}" />
@@ -84,6 +94,7 @@
 
 <script type="text/html" id="tmpl-wpPostAttachments-youtube">
     <div>
+        {{{ data.renderString('thumb', data) }}}
         <span><i class="fa fa-youtube-play"></i> Youtube Video</span>
         <input type="hidden" name="type" value="youtube" />
         <input type="text" name="video_id" value="{{ data.video_id }}" data-model="video_id" />
@@ -99,5 +110,15 @@
         Link removed
         <button type="button" data-action="delete-undo" title="Undo link removal"><i class="fa fa-undo"></i> Undo</button>
         <button type="button" data-action="delete-confirm" title="Dismiss this notification"><i class="fa fa-times"></i></button>
+    </div>
+</script>
+
+<script type="text/html" id="tmpl-wpPostAttachments-thumb">
+    <div class="wppl-thumb" style="border:1px solid #ccc;width:150px;">
+        <# if (data.thumb_url) { #>
+            <img src="{{ data.thumb_url }}" style="display:block;width:100%;" />
+        <# } else { #>
+            <img src="http://placehold.it/150x150" style="display:block;width:100%;height:100%;" />
+        <# } #>
     </div>
 </script>

@@ -29,67 +29,46 @@ selectFile = (onSelect, options) ->
 
     frame.open()
 
+# perform additional logic when rendering attachment
+renderers =
+    youtube: (el, data) ->
+        model = el.find('[name*="video_id"]:input')
+
+        loadDefaultThumb = ->
+            src = "http://img.youtube.com/vi/#{ model.val() }/default.jpg"
+            $('<img/>').attr('src', src).prependTo(el)
+            return
+
+        model.change loadDefaultThumb
+        loadDefaultThumb()
+
+        return
+
+
 renderAttachment = (type, data) ->
     li = $ '<li class="wppa-link" />'
     li.appendTo '#wpPostAttachments-list'
     li.append (el = render(type, data))
-    console?.log 'trigger insert', el
 
+    if typeof renderers[type] == 'function'
+        renderers[type] el, data
 
-
-createLinkFields = () ->
-    renderAttachment 'link'
-
-createFileFields = (type, file) ->
-    console?.log type, file
-    renderAttachment type ? 'file',
-        file: file
-        file_id: file.id
-        title: file.title
-        description: file.description
-
-createYoutubeFields = () ->
-    renderAttachment 'youtube'
+    return li
 
 # type is optional
 attachFile = (type) ->
     selectFile (selected) ->
         # create box for each selected file
         _.each selected, (file) ->
-            createFileFields type, file
+            console?.log file
+            renderAttachment type ? 'file',
+               file: file
+               file_id: file.id
+               title: file.title
+               description: file.description
+               thumb_url: if file.sizes then file.sizes.thumbnail.url else file.thumb_src
     , {type: type, multiple: yes}
 
-attachYoutube = ->
-    console?.log 'attachYoutube'
-
-    # load in background default thumbnail
-    el = createYoutubeFields()
-    # here el should be appended to DOM
-
-    model = el.find('[data-model="video_id"]')
-
-    loadDefaultThumb = ->
-        console?.log 'loadDefaultThumb', model.val()
-        # remove any previous image
-        el.find('img.default-thumb').remove()
-        i = new Image()
-        i.onload = ->
-            img = $ '<img class="default-thumb" />'
-            img.attr 'src', @src
-            img.prependTo el
-            @onload = null
-            return
-        i.src = "http://img.youtube.com/vi/#{ model.val() }/default.jpg"
-        return
-
-    model.change loadDefaultThumb
-    loadDefaultThumb()
-
-    return el
-
-
-attachLink = ->
-    createLinkFields()
 
 # name generator for form fields
 nameGenerator =
@@ -136,7 +115,7 @@ $ ->
 
     $('#post-attachments-metabox')
         .on 'click', '[data-action="attach-link"]', ->
-            attachLink()
+            renderAttachment 'link'
             return false
 
         .on 'click', '[data-action="attach-file"]', ->
@@ -148,7 +127,7 @@ $ ->
             return false
 
         .on 'click', '[data-action="attach-youtube"]', ->
-            attachYoutube()
+            renderAttachment 'youtube'
             return false
 
         .on 'click', '[data-action="attachment-delete"]', ->

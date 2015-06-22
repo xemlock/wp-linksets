@@ -30,4 +30,18 @@ class File extends Attachment
         $array['file_id'] = $this->get_file_id();
         return $array;
     }
+
+    public function get_thumb_url($size = null)
+    {
+        if (($thumb_url = parent::get_thumb_url($size)) !== false) {
+            return $thumb_url;
+        }
+        // try to get thumbnail directly from the referenced file
+        $img = wp_get_attachment_image_src((int) $this->get_file_id(), $size);
+        if ($img) {
+            // [0 => url, 1 => width, 2 => height]
+            return $img[0];
+        }
+        return false;
+    }
 }
