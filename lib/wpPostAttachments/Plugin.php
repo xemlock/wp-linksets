@@ -6,6 +6,7 @@ class Plugin
 {
     const REQUEST_KEY   = 'post_attachments';
     const POST_PROPERTY = 'post_attachments';
+    const FEATURE_KEY   = 'post-attachments';
     const POST_META_KEY = '_post_attachments';
 
     /**
@@ -18,33 +19,11 @@ class Plugin
         'youtube' => '\\wpPostAttachments\\Attachment\\Youtube',
     );
 
-    /**
-     * @var array
-     */
-    protected $_post_types = array();
+    protected $_postTypes = array();
 
     public function init()
     {
-        static $initialized = false;
-
-        if (!$initialized) {
-            add_action('add_meta_boxes', array($this, 'add_meta_boxes'));
-
-            // in order to save post its content must not be considered empty
-            // make sure post is not empty if attachments are provided in the request
-            add_filter('wp_insert_post_empty_content', array($this, '_is_post_content_empty'));
-
-            // these are not called if base post fields are not changed
-            add_action('save_post', array($this, 'save_post'));
-
-            // attachments use different hooks
-            add_action('edit_attachment', array($this, 'save_post'));
-            add_action('add_attachment', array($this, 'save_post'));
-
-            add_action('the_post', array($this, 'the_post'));
-
-            $initialized = true;
-        }
+        add_action('init', array($this, 'on_init'));
     }
 
     /**
@@ -58,13 +37,56 @@ class Plugin
     {
         $post_types = (array) $post_type;
         foreach ($post_types as $post_type) {
-            $this->_post_types[] = (string) $post_type;
+            $this->_postTypes[$post_type] = true;
         }
+    }
+
+    /**
+     * Is post attachment functionality enabled for the given post type
+     *
+     * @param string $post_type
+     * @return bool
+     */
+    public function is_enabled($post_type)
+    {
+        return isset($this->_postTypes[$post_type]);
     }
 
     public function get_post_types()
     {
-        return $this->_post_types;
+        return array_keys($this->_postTypes);
+    }
+
+    public function on_init()
+    {
+        // retrieve post types registered via add_theme_support()
+        $supported = get_theme_support(self::FEATURE_KEY);
+
+        if ($supported) {
+            // if not explicitly specified, enable support for post and page
+            if ($supported === true) {
+                $supported = array('post', 'page');
+            }
+            foreach ((array) $supported as $post_type) {
+                // post_type can still be an array here
+                $this->enable($post_type);
+            }
+        }
+
+        add_action('add_meta_boxes', array($this, 'add_meta_boxes'));
+
+        // in order to save post its content must not be considered empty
+        // make sure post is not empty if attachments are provided in the request
+        add_filter('wp_insert_post_empty_content', array($this, '_is_post_content_empty'));
+
+        // these are not called if base post fields are not changed
+        add_action('save_post', array($this, 'on_save_post'));
+
+        // attachments use different hooks
+        add_action('edit_attachment', array($this, 'on_save_post'));
+        add_action('add_attachment', array($this, 'on_save_post'));
+
+        add_action('the_post', array($this, 'on_post'));
     }
 
     /**
@@ -72,7 +94,7 @@ class Plugin
      */
     public function add_meta_boxes()
     {
-        foreach ($this->_post_types as $post_type) {
+        foreach ($this->get_post_types() as $post_type) {
             add_meta_box('post_attachments', 'Post attachments', array($this, 'render_metabox'), $post_type, 'normal', 'default', null);
         }
     }
@@ -86,7 +108,7 @@ class Plugin
      * @param int $post_id
      * @internal
      */
-    public function save_post($post_id)
+    public function on_save_post($post_id)
     {
         // Don't update metadata when auto saving post
         // http://wordpress.stackexchange.com/questions/14282/custom-post-type-metabox-not-saving
@@ -100,7 +122,7 @@ class Plugin
 
         $post = get_post($post_id);
 
-        if ($post && in_array($post->post_type, $this->_post_types) && isset($_POST[self::REQUEST_KEY])) {
+        if ($post && $this->is_enabled($post->post_type) && isset($_POST[self::REQUEST_KEY])) {
             $attachments = array();
             foreach ((array) $_POST[self::REQUEST_KEY] as $data) {
                 if (($attachment = $this->create_attachment($data)) !== null) {
@@ -108,9 +130,12 @@ class Plugin
                 }
             }
 
-            $meta = wp_json_encode(
-                array_map(array($this, '_attachment_to_array'), $attachments)
-            );
+            $meta = wp_json_encode(array_map(
+                function (\wpPostAttachments\Attachment\Attachment $attachment) {
+                    return $attachment->to_array();
+                },
+                $attachments
+            ));
             update_post_meta($post_id, self::POST_META_KEY, $meta);
 
             $post->{self::POST_PROPERTY} = $attachments;
@@ -121,35 +146,25 @@ class Plugin
     }
 
     /**
-     * @param bool $is_empty
+     * @param bool $isEmpty
      * @return bool
      * @internal
      */
-    public function _is_post_content_empty($is_empty)
+    public function _is_post_content_empty($isEmpty)
     {
         if (isset($_POST[self::REQUEST_KEY])) {
             return false;
         }
-        return $is_empty;
-    }
-
-    /**
-     * @param \wpPostAttachments\Attachment\Attachment $attachment
-     * @return array
-     * @internal
-     */
-    public function _attachment_to_array(\wpPostAttachments\Attachment\Attachment $attachment)
-    {
-        return $attachment->to_array();
+        return $isEmpty;
     }
 
     /**
      * @param \WP_Post $post
      * @internal
      */
-    public function the_post(\WP_Post $post)
+    public function on_post(\WP_Post $post)
     {
-        if (in_array($post->post_type, $this->_post_types)) {
+        if ($this->is_enabled($post->post_type)) {
             $post->{self::POST_PROPERTY} = $this->get_post_attachments($post->ID);
         }
     }
@@ -276,5 +291,10 @@ class Plugin
             self::$_instance = new self();
         }
         return self::$_instance;
+    }
+
+    public static function start()
+    {
+        self::get_instance()->init();
     }
 }
