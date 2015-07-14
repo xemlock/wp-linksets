@@ -2,12 +2,12 @@
 
 /**
  * Plugin Name: WP Post Attachments
- * Plugin URI: http://github.com/xemlock/wp-post-attachments
+ * Plugin URI:  http://github.com/xemlock/wp-post-attachments
  * Description:
- * Author: xemlock <xemlock@gmail.com>
- * Author URI: http://xemlock.pl
- * Version: 0.1.0
- * License: GPLv2 or later
+ * Author:      xemlock <xemlock@gmail.com>
+ * Author URI:  http://xemlock.pl
+ * Version:     0.1.0
+ * License:     GPLv2 or later
  */
 
 defined('ABSPATH') || die();

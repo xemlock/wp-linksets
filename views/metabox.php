@@ -36,7 +36,7 @@
 <script>
     <?php
         $post_attachments = array();
-        foreach ($this->get_post_attachments() as $attachment) {
+        foreach ($post->post_links as $attachment) {
             $post_attachments[] = array_merge($attachment->to_array(), array('thumb_url' => $attachment->get_thumb_url('thumbnail')));
         }
     ?>

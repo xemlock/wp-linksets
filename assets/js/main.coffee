@@ -74,7 +74,7 @@ attachFile = (type) ->
 nameGenerator =
     _counter: 0
     name: (n) ->
-        "post_attachments[#{ @_counter }][#{ n }]"
+        "post_links[#{ @_counter }][#{ n }]"
     next: ->
         ++@_counter
 
