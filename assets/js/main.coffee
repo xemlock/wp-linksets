@@ -29,6 +29,7 @@ selectFile = (onSelect, options) ->
 
     frame.open()
 
+
 # perform additional logic when rendering attachment
 renderers =
     youtube: (el, data) ->
@@ -36,19 +37,23 @@ renderers =
 
         loadDefaultThumb = ->
             src = "http://img.youtube.com/vi/#{ model.val() }/default.jpg"
-            $('<img/>').attr('src', src).prependTo(el)
+            thumb_id = el.find('[name*="thumb_id"]:input').val()
+            console?.log thumb_id
+            if $.trim(thumb_id) == ''
+                el.find('img').attr('src', src)
             return
 
         model.change loadDefaultThumb
         loadDefaultThumb()
 
+        # TODO show default YT thumb when thumbnail is removed
         return
 
 
 renderAttachment = (type, data) ->
     li = $ '<li class="wppa-link" />'
     li.appendTo '#wpPostAttachments-list'
-    li.append (el = render(type, data))
+    li.append (el = renderRenamed(type, data))
 
     if typeof renderers[type] == 'function'
         renderers[type] el, data
@@ -69,6 +74,15 @@ attachFile = (type) ->
                thumb_url: if file.sizes then file.sizes.thumbnail.url else file.thumb_src
     , {type: type, multiple: yes}
 
+renderRenamed = (name, data) ->
+    nameGenerator.next()
+
+    el = render name, data
+    el.find('[name]').each ->
+      $this = $ this
+      $this.attr 'name', nameGenerator.name($this.attr 'name')
+
+    return el
 
 # name generator for form fields
 nameGenerator =
@@ -81,7 +95,6 @@ nameGenerator =
 # Renders template using built-in WordPress client-side templating system
 # based on Underscore templates
 render = (name, data) ->
-    nameGenerator.next()
     template = wp.template "wpPostAttachments-#{ name }"
 
     data = $.extend
@@ -92,11 +105,8 @@ render = (name, data) ->
     , data
 
     el = $(template data)
-    el.find('[name]').each ->
-        $this = $ this
-        $this.attr 'name', nameGenerator.name($this.attr 'name')
 
-    return el
+
 
 renderString = (name, data) ->
     return $('<div/>').append(render name, data).html()
@@ -158,6 +168,19 @@ $ ->
                 opacity: 0
             , -> $(this).remove()
             return false
+
+        .on 'click', '[data-action="thumb-select"]', ->
+            selectFile (selection) =>
+                selectedImage = selection[0]
+                console?.log selectedImage, this
+                # selectedImage.url
+                thumb = if selectedImage.sizes.thumbnail then selectedImage.sizes.thumbnail else selectedImage.sizes.full
+                $(this).find('img').attr('src', thumb.url)
+                $(this).find('[name*="thumb_id"]').val(selectedImage.id)
+            ,
+                type: 'image'
+                multiple: false
+
 
 
 

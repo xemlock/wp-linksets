@@ -138,19 +138,15 @@ class Plugin
         $post = get_post($post_id);
 
         if ($post && $this->is_enabled($post->post_type) && isset($_POST[self::REQUEST_KEY])) {
-            $attachments = array();
+            $attachments = new Attachment\Collection();
+
             foreach ((array) $_POST[self::REQUEST_KEY] as $data) {
                 if (($attachment = $this->create_attachment($data)) !== null) {
                     $attachments[] = $attachment;
                 }
             }
 
-            $meta = wp_json_encode(array_map(
-                function (\wpPostAttachments\Attachment\Attachment $attachment) {
-                    return $attachment->to_array();
-                },
-                $attachments
-            ));
+            $meta = wp_json_encode($attachments->to_array());
             update_post_meta($post_id, self::POST_META_KEY, $meta);
 
             $post->{self::POST_PROPERTY} = $attachments;
@@ -201,7 +197,7 @@ class Plugin
         $meta = get_post_meta((int) $post_id, self::POST_META_KEY, true);
         $data = (array) json_decode($meta, true);
 
-        $attachments = array();
+        $attachments = new Attachment\Collection();
         foreach ($data as $val) {
             if (($attachment = $this->create_attachment($val)) !== null) {
                 $attachments[] = $attachment;

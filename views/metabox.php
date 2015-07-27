@@ -1,4 +1,5 @@
 <?php defined('ABSPATH') || die(); ?>
+<?php // ini_set('display_errors', 1);error_reporting(-1); ?>
 <?php /** @var \wpPostAttachments\Plugin $this */ ?>
 
 <style>
@@ -21,6 +22,34 @@
     padding: 10px;
 }
 
+.wppl-thumb {
+    border:1px solid #ccc;width:150px;height:150px;text-align:center;overflow:hidden;
+}
+.wppl-thumb-inner {
+    width:300px;
+    height:100%;
+    margin-left:-75px;
+    position: relative;
+    z-index: 0;
+}
+.wppl-thumb img {
+    max-height: 100%;
+    max-width: 100%;
+}
+.wppl-thumb-inner:hover {
+    cursor: pointer;
+}
+.wppl-thumb-inner:hover:before {
+    content: '';
+    display: block;
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    border: 4px solid red;
+    z-index: 2;
+}
 </style>
 
 <link href="<?php echo $this->get_plugin_url('assets/vendor/font-awesome/css/font-awesome.min.css') ?>" rel="stylesheet" type="text/css" />
@@ -36,7 +65,7 @@
 <script>
     <?php
         $post_attachments = array();
-        foreach ($post->post_links as $attachment) {
+        foreach ($this->get_post_attachments($post) as $attachment) {
             $post_attachments[] = array_merge($attachment->to_array(), array('thumb_url' => $attachment->get_thumb_url('thumbnail')));
         }
     ?>
@@ -97,7 +126,7 @@
         {{{ data.renderString('thumb', data) }}}
         <span><i class="fa fa-youtube-play"></i> Youtube Video</span>
         <input type="hidden" name="type" value="youtube" />
-        <input type="text" name="video_id" value="{{ data.video_id }}" data-model="video_id" />
+        <input type="text" name="video_id" value="{{ data.video_id }}" />
         <input type="text" name="title" value="{{ data.title }}" />
         <input type="text" name="date" value="{{ data.value }}" placeholder="YYYY-MM-DD HH:MM" />
         <textarea name="description">{{ data.description }}</textarea>
@@ -114,13 +143,14 @@
 </script>
 
 <script type="text/html" id="tmpl-wpPostAttachments-thumb">
-    <div class="wppl-thumb" style="border:1px solid #ccc;width:150px;height:150px;text-align:center;overflow:hidden;">
-        <div style="width:300px;height:100%;margin-left:-75px">
-        <# if (data.thumb_url) { #>
-            <img src="{{ data.thumb_url }}" style="height:100%;" />
-        <# } else { #>
-            <img src="http://placehold.it/150x150" style="height:100%;" />
-        <# } #>
+    <div class="wppl-thumb">
+        <div class="wppl-thumb-inner" data-action="thumb-select">
+            <input type="hidden" name="thumb_id" value="{{ data.thumb_id }}" />
+            <# if (data.thumb_url) { #>
+                <img src="{{ data.thumb_url }}" alt="" />
+            <# } else { #>
+                <img src="http://placehold.it/150x150" alt="" />
+            <# } #>
         </div>
     </div>
 </script>
