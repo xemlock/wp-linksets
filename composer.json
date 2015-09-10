@@ -1,5 +1,5 @@
 {
-    "name": "xemlock/wp-post-attachments",
+    "name": "xemlock/wp-linksets",
     "description": "",
     "license": "MIT",
     "authors": [
@@ -13,7 +13,7 @@
     },
     "autoload": {
         "psr-0": {
-            "wpPostAttachments\\": "lib/"
+            "wpLinksets\\": "lib/"
         },
         "files": [
             "bootstrap.php"
