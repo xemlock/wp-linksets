@@ -1,9 +1,11 @@
 <?php
 
-namespace wpPostAttachments\Attachment;
+namespace wpLinksets\Link;
 
-class Youtube extends Attachment
+class Youtube extends BaseLink
 {
+    const TYPE = 'youtube';
+
     /**
      * Youtube Video ID
      * @var string
@@ -15,7 +17,7 @@ class Youtube extends Attachment
      */
     public function get_type()
     {
-        return 'youtube';
+        return static::TYPE;
     }
 
     /**
@@ -37,6 +39,15 @@ class Youtube extends Attachment
     /**
      * @return string
      */
+    public function get_url()
+    {
+        $video_id = $this->get_video_id();
+        return sprintf('http://www.youtube.com/watch?v=%s', urlencode($video_id));
+    }
+
+    /**
+     * @return string
+     */
     public function get_thumb_url($size = null)
     {
         $thumb_url = parent::get_thumb_url($size);
@@ -46,7 +57,8 @@ class Youtube extends Attachment
             // - mqdefault (320x180px)
             // - hqdefault (480x360px)
             // - sddefault (640x480px)
-            $thumb_url = sprintf('http://img.youtube.com/vi/%s/hqdefault.jpg', urlencode($this->get_video_id()));
+            $video_id = $this->get_video_id();
+            $thumb_url = sprintf('http://img.youtube.com/vi/%s/hqdefault.jpg', urlencode($video_id));
         }
         return $thumb_url;
     }
@@ -59,5 +71,18 @@ class Youtube extends Attachment
         $array = parent::to_array();
         $array['video_id'] = $this->get_video_id();
         return $array;
+    }
+
+    /**
+     * @param array $data
+     * @return Youtube
+     */
+    public static function from_array(array $data)
+    {
+        $link = new static();
+        if (isset($data['video_id'])) {
+            $link->set_video_id($data['video_id']);
+        }
+        return $link;
     }
 }

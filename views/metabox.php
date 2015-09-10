@@ -1,6 +1,6 @@
 <?php defined('ABSPATH') || die(); ?>
 <?php // ini_set('display_errors', 1);error_reporting(-1); ?>
-<?php /** @var \wpPostAttachments\Plugin $this */ ?>
+<?php /** @var \wpLinksets\Plugin $this */ ?>
 
 <style>
 .wppa-link {
@@ -65,7 +65,7 @@
 <script>
     <?php
         $post_attachments = array();
-        foreach ($this->get_post_attachments($post) as $attachment) {
+        foreach ($this->get_post_linkset($post) as $attachment) {
             $post_attachments[] = array_merge($attachment->to_array(), array('thumb_url' => $attachment->get_thumb_url('thumbnail')));
         }
     ?>

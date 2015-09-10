@@ -1,14 +1,22 @@
 <?php
 
-namespace wpPostAttachments\Attachment;
+namespace wpLinksets;
 
 
-class Collection implements \Countable, \ArrayAccess, \IteratorAggregate
+class Linkset implements \Countable, \ArrayAccess, \IteratorAggregate
 {
     /**
-     * @var \wpPostAttachments\Attachment[]
+     * @var Link\BaseLink[]
      */
     protected $_items = array();
+
+    /**
+     * @param Link\BaseLink $attachment
+     */
+    public function add(Link\BaseLink $attachment)
+    {
+        $this->_items[] = $attachment;
+    }
 
     /**
      * @return array
@@ -16,7 +24,7 @@ class Collection implements \Countable, \ArrayAccess, \IteratorAggregate
     public function to_array()
     {
         return array_map(
-            function (\wpPostAttachments\Attachment\Attachment $attachment) {
+            function (Link\BaseLink $attachment) {
                 return $attachment->to_array();
             },
             $this->_items
@@ -33,7 +41,7 @@ class Collection implements \Countable, \ArrayAccess, \IteratorAggregate
 
     /**
      * @param midex $offset
-     * @return \wpPostAttachments\Attachment|null
+     * @return Link\BaseLink|null
      */
     public function offsetGet($offset)
     {
@@ -42,13 +50,13 @@ class Collection implements \Countable, \ArrayAccess, \IteratorAggregate
 
     /**
      * @param mixed $offset
-     * @param \wpPostAttachments\Attachment $item
+     * @param Link\BaseLink $item
      * @throws \OutOfBoundsException
      * @throws \InvalidArgumentException
      */
     public function offsetSet($offset, $item)
     {
-        if (!$item instanceof Attachment) {
+        if (!$item instanceof Link\BaseLink) {
             throw new \InvalidArgumentException('Item must be an instance of \wpPostAttachments\Attachment');
         }
         if ($offset === null) {

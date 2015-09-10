@@ -1,8 +1,8 @@
 <?php
 
 /**
- * Plugin Name: WP Post Attachments
- * Plugin URI:  http://github.com/xemlock/wp-post-attachments
+ * Plugin Name: WP Linksets
+ * Plugin URI:  http://github.com/xemlock/wp-linksets
  * Description:
  * Author:      xemlock <xemlock@gmail.com>
  * Author URI:  http://xemlock.pl
@@ -16,4 +16,4 @@ if (file_exists($autoload = __DIR__ . '/vendor/autoload.php')) {
     require_once $autoload;
 }
 
-wpPostAttachments\Plugin::start();
+wpLinksets\Plugin::start();

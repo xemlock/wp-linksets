@@ -1,8 +1,8 @@
 <?php
 
-namespace wpPostAttachments\Attachment;
+namespace wpLinksets\Link;
 
-abstract class Attachment
+abstract class BaseLink
 {
     /**
      * @var string
@@ -30,19 +30,14 @@ abstract class Attachment
     protected $_thumb_id;
 
     /**
-     * @param array $data
+     * @return string
      */
-    public function __construct(array $data = null)
-    {
-        if ($data) {
-            $this->set_from_array($data);
-        }
-    }
+    abstract public function get_type();
 
     /**
      * @return string
      */
-    abstract public function get_type();
+    abstract public function get_url();
 
     /**
      * @param string $title
@@ -167,21 +162,6 @@ abstract class Attachment
     }
 
     /**
-     * @return array
-     */
-    public function to_array()
-    {
-        return array(
-            'type'        => $this->get_type(),
-            'title'       => $this->get_title(),
-            'description' => $this->get_description(),
-            'date'        => $this->get_date(),
-            'author_id'   => $this->get_author_id(),
-            'thumb_id'    => $this->get_thumb_id(),
-        );
-    }
-
-    /**
      * @param string $key
      * @return mixed
      */
@@ -202,5 +182,38 @@ abstract class Attachment
             $this->$method($value);
             return;
         }
+    }
+
+    /**
+     * @param string $key
+     * @return bool
+     */
+    public function __isset($key)
+    {
+        return $this->__get($key) !== null;
+    }
+
+    /**
+     * @return array
+     */
+    public function to_array()
+    {
+        return array(
+            'type'        => $this->get_type(),
+            'title'       => $this->get_title(),
+            'description' => $this->get_description(),
+            'date'        => $this->get_date(),
+            'author_id'   => $this->get_author_id(),
+            'thumb_id'    => $this->get_thumb_id(),
+        );
+    }
+
+    /**
+     * @param array $data
+     * @return BaseLink
+     */
+    public static function from_array(array $data)
+    {
+        throw new \BadMethodCallException('This method must be implemented by subclasses');
     }
 }

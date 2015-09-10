@@ -1,26 +1,30 @@
 <?php
 
-namespace wpPostAttachments;
+namespace wpLinksets;
 
 class Plugin
 {
-    const REQUEST_KEY   = 'post_links';
-    const POST_PROPERTY = 'post_links';
-    const FEATURE_KEY   = 'post-attachments';
-    const POST_META_KEY = '_post_links';
+    const FEATURE_KEY   = 'linksets';
+    const REQUEST_KEY   = 'linkset';
+    const POST_PROPERTY = 'post_linkset';
+    const POST_META_KEY = '_post_linkset';
 
     /**
-     * Link type handlers
+     * Factory used for link instantiation
+     * @var LinkFactory
+     */
+    protected $_link_factory;
+
+    /**
+     * List of post types linkset feature is enabled for
      * @var array
      */
-    protected $_type_classes = array(
-        'link'    => '\\wpPostAttachments\\Attachment\\Link',
-        'file'    => '\\wpPostAttachments\\Attachment\\File',
-        'audio'   => '\\wpPostAttachments\\Attachment\\Audio',
-        'youtube' => '\\wpPostAttachments\\Attachment\\Youtube',
-    );
-
     protected $_post_types = array();
+
+    public function __construct()
+    {
+        $this->_link_factory = new LinkFactory();
+    }
 
     public function init()
     {
@@ -111,7 +115,7 @@ class Plugin
     public function on_meta_boxes()
     {
         foreach ($this->get_post_types() as $post_type) {
-            add_meta_box('post_attachments', 'Post attachments', array($this, 'render_metabox'), $post_type, 'normal', 'default', null);
+            add_meta_box('post_attachments', 'Linksets', array($this, 'render_metabox'), $post_type, 'normal', 'default', null);
         }
     }
 
@@ -138,18 +142,21 @@ class Plugin
         $post = get_post($post_id);
 
         if ($post && $this->is_enabled($post->post_type) && isset($_POST[self::REQUEST_KEY])) {
-            $attachments = new Attachment\Collection();
+            $linkset = new Linkset();
 
             foreach ((array) $_POST[self::REQUEST_KEY] as $data) {
-                if (($attachment = $this->create_attachment($data)) !== null) {
-                    $attachments[] = $attachment;
+                try {
+                    $link = $this->_link_factory->create_link($data);
+                    $linkset->add($link);
+                } catch (Exception $e) {
+                    // do nothing, or log error elsewhere
                 }
             }
 
-            $meta = wp_json_encode($attachments->to_array());
+            $meta = wp_json_encode($linkset->to_array());
             update_post_meta($post_id, self::POST_META_KEY, $meta);
 
-            $post->{self::POST_PROPERTY} = $attachments;
+            $post->{self::POST_PROPERTY} = $linkset;
         }
 
         // echo @$meta;
@@ -176,15 +183,15 @@ class Plugin
     public function on_post(\WP_Post $post)
     {
         if ($this->is_enabled($post->post_type)) {
-            $post->{self::POST_PROPERTY} = $this->get_post_attachments($post->ID);
+            $post->{self::POST_PROPERTY} = $this->get_post_linkset($post->ID);
         }
     }
 
     /**
      * @param int|WP_Post $post_id OPTIONAL
-     * @return \wpPostAttachments\Attachment\Attachment[]
+     * @return \wpLinksets\Linkset[]
      */
-    public function get_post_attachments($post_id = null)
+    public function get_post_linkset($post_id = null)
     {
         if ($post_id === null) {
             $post_id = get_post();
@@ -197,40 +204,16 @@ class Plugin
         $meta = get_post_meta((int) $post_id, self::POST_META_KEY, true);
         $data = (array) json_decode($meta, true);
 
-        $attachments = new Attachment\Collection();
+        $linkset = new Linkset();
         foreach ($data as $val) {
-            if (($attachment = $this->create_attachment($val)) !== null) {
-                $attachments[] = $attachment;
+            try {
+                $link = $this->_link_factory->create_link($val);
+                $linkset->add($link);
+            } catch (Exception $e) {
+                // do nothing, or log error elsewhere
             }
         }
-        return $attachments;
-    }
-
-    /**
-     * @param string|array $type
-     * @return \wpPostAttachments\Attachment\Attachment|null
-     */
-    public function create_attachment($type)
-    {
-        if (is_array($type)) {
-            $data = $type;
-            $type = (string) $data['type'];
-        } else {
-            $data = null;
-            $type = (string) $type;
-        }
-
-        if (isset($this->_type_classes[$type])) {
-            $class = $this->_type_classes[$type];
-            /** @var \wpPostAttachments\Attachment\Attachment $attachment */
-            $attachment = new $class();
-            if ($data) {
-                $attachment->set_from_array($data);
-            }
-            return $attachment;
-        }
-
-        return null;
+        return $linkset;
     }
 
     /**
@@ -287,14 +270,14 @@ class Plugin
 
 
     /**
-     * @var \wpPostAttachments\Plugin
+     * @var \wpLinksets\Plugin
      */
     protected static $_instance;
 
     /**
      * Retrieves the globally accessible plugin instance
      *
-     * @return \wpPostAttachments\Plugin
+     * @return \wpLinksets\Plugin
      */
     public static function get_instance()
     {
