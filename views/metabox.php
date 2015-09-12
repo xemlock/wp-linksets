@@ -64,12 +64,12 @@
 
 <script>
     <?php
-        $post_attachments = array();
-        foreach ($this->get_post_linkset($post) as $attachment) {
-            $post_attachments[] = array_merge($attachment->to_array(), array('thumb_url' => $attachment->get_thumb_url('thumbnail')));
+        $linkset = array();
+        foreach ($this->get_linkset($post) as $link) {
+            $linkset[] = array_merge($link->to_array(), array('thumb_url' => $link->get_thumb_url('thumbnail')));
         }
     ?>
-    window.postAttachments = <?php echo wp_json_encode($post_attachments) ?>;
+    window.postAttachments = <?php echo wp_json_encode($linkset) ?>;
 </script>
 
 <script type="text/html" id="tmpl-wpPostAttachments-main">
@@ -82,55 +82,33 @@
     </div>
 </script>
 
-<script type="text/html" id="tmpl-wpPostAttachments-link">
+<script type="text/html" id="tmpl-wpPostAttachments-item-link">
     <div>
-        {{{ data.renderString('thumb', data) }}}
         <span><i class="fa fa-link"></i> Website link</span>
         <input type="hidden" name="type" value="link" />
         <input type="text" name="url" value="{{ data.url }}" placeholder="http://" />
-        <input type="text" name="title" value="{{ data.title }}" />
-        <input type="text" name="date" value="{{ data.value }}" placeholder="YYYY-MM-DD HH:MM" />
-        <textarea name="description">{{ data.description }}</textarea>
-        <button type="button" data-action="attachment-delete"><i class="fa fa-times"></i></button>
     </div>
 </script>
 
-<script type="text/html" id="tmpl-wpPostAttachments-file">
+<script type="text/html" id="tmpl-wpPostAttachments-item-file">
     <div>
-        {{{ data.renderString('thumb', data) }}}
         <span><i class="fa fa-file-text"></i> File</span>
-        <input type="hidden" name="type" value="file" />
         <input type="hidden" name="file_id" value="{{ data.file_id }}" />
-        <input type="text" name="title" value="{{ data.title }}" />
-        <input type="text" name="date" value="{{ data.value }}" placeholder="YYYY-MM-DD HH:MM" />
-        <textarea name="description">{{ data.description }}</textarea>
-        <button type="button" data-action="attachment-delete"><i class="fa fa-times"></i></button>
     </div>
 </script>
 
-<script type="text/html" id="tmpl-wpPostAttachments-audio">
+<script type="text/html" id="tmpl-wpPostAttachments-item-audio">
     <div>
-        {{{ data.renderString('thumb', data) }}}
         <span><i class="fa fa-volume-up"></i> Audio file</span>
-        <input type="hidden" name="type" value="audio" />
         <input type="hidden" name="file_id" value="{{ data.file_id }}" />
-        <input type="text" name="title" value="{{ data.title }}" />
-        <input type="text" name="date" value="{{ data.value }}" placeholder="YYYY-MM-DD HH:MM" />
-        <textarea name="description">{{ data.description }}</textarea>
-        <button type="button" data-action="attachment-delete"><i class="fa fa-times"></i></button>
     </div>
 </script>
 
-<script type="text/html" id="tmpl-wpPostAttachments-youtube">
+<script type="text/html" id="tmpl-wpPostAttachments-item-youtube">
     <div>
-        {{{ data.renderString('thumb', data) }}}
         <span><i class="fa fa-youtube-play"></i> Youtube Video</span>
         <input type="hidden" name="type" value="youtube" />
         <input type="text" name="video_id" value="{{ data.video_id }}" />
-        <input type="text" name="title" value="{{ data.title }}" />
-        <input type="text" name="date" value="{{ data.value }}" placeholder="YYYY-MM-DD HH:MM" />
-        <textarea name="description">{{ data.description }}</textarea>
-        <button type="button" data-action="attachment-delete"><i class="fa fa-times"></i></button>
     </div>
 </script>
 
@@ -152,5 +130,17 @@
                 <img src="http://placehold.it/150x150" alt="" />
             <# } #>
         </div>
+    </div>
+</script>
+
+<script type="text/html" id="tmpl-wpPostAttachments-item">
+    <div>
+        {{{ data.renderString('thumb', data) }}}
+        {{{ data.renderString('item-' + data.type) }}}
+        <input type="hidden" name="type" value="{{ data.type }}" />
+        <input type="text" name="title" value="{{ data.title }}" />
+        <textarea name="description">{{ data.description }}</textarea>
+        <input type="hidden" name="date" value="{{ data.value }}" placeholder="YYYY-MM-DD HH:MM" />
+        <button type="button" data-action="attachment-delete"><i class="fa fa-times"></i></button>
     </div>
 </script>

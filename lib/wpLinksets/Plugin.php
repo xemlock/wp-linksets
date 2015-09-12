@@ -6,8 +6,8 @@ class Plugin
 {
     const FEATURE_KEY   = 'linksets';
     const REQUEST_KEY   = 'linkset';
+    const META_KEY      = '_linkset';
     const POST_PROPERTY = 'post_linkset';
-    const POST_META_KEY = '_post_linkset';
 
     /**
      * Factory used for link instantiation
@@ -154,7 +154,7 @@ class Plugin
             }
 
             $meta = wp_json_encode($linkset->to_array());
-            update_post_meta($post_id, self::POST_META_KEY, $meta);
+            update_post_meta($post_id, self::META_KEY, $meta);
 
             $post->{self::POST_PROPERTY} = $linkset;
         }
@@ -183,15 +183,17 @@ class Plugin
     public function on_post(\WP_Post $post)
     {
         if ($this->is_enabled($post->post_type)) {
-            $post->{self::POST_PROPERTY} = $this->get_post_linkset($post->ID);
+            $post->{self::POST_PROPERTY} = $this->get_linkset($post->ID);
         }
     }
 
     /**
-     * @param int|WP_Post $post_id OPTIONAL
+     * Prior to building linkset data is filtered by get_linkset filter.
+     *
+     * @param int|\WP_Post $post_id OPTIONAL
      * @return \wpLinksets\Linkset[]
      */
-    public function get_post_linkset($post_id = null)
+    public function get_linkset($post_id = null)
     {
         if ($post_id === null) {
             $post_id = get_post();
@@ -201,11 +203,12 @@ class Plugin
             $post_id = $post_id->ID;
         }
 
-        $meta = get_post_meta((int) $post_id, self::POST_META_KEY, true);
+        $meta = get_post_meta((int) $post_id, self::META_KEY, true);
         $data = (array) json_decode($meta, true);
+        $data = apply_filters('get_linkset', $data);
 
         $linkset = new Linkset();
-        foreach ($data as $val) {
+        foreach ((array) $data as $val) {
             try {
                 $link = $this->_link_factory->create_link($val);
                 $linkset->add($link);
@@ -213,6 +216,7 @@ class Plugin
                 // do nothing, or log error elsewhere
             }
         }
+
         return $linkset;
     }
 

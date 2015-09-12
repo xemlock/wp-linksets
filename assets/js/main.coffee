@@ -49,11 +49,16 @@ renderers =
         # TODO show default YT thumb when thumbnail is removed
         return
 
+# Render link using given data
+renderAttachment = (data) ->
+    if typeof data == 'string'
+        data = {type: data}
 
-renderAttachment = (type, data) ->
+    type = data.type
+
     li = $ '<li class="wppa-link" />'
     li.appendTo '#wpPostAttachments-list'
-    li.append (el = renderRenamed(type, data))
+    li.append (el = renderRenamed 'item', data)
 
     if typeof renderers[type] == 'function'
         renderers[type] el, data
@@ -74,8 +79,11 @@ attachFile = (type) ->
                thumb_url: if file.sizes then file.sizes.thumbnail.url else file.thumb_src
     , {type: type, multiple: yes}
 
+# render link
 renderRenamed = (name, data) ->
     nameGenerator.next()
+
+    console?.log 'renderRenamed', name, data
 
     el = render name, data
     el.find('[name]').each ->

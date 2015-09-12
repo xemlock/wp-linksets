@@ -36,6 +36,6 @@ class LinkFactory
             return $link;
         }
 
-        return null;
+        throw new \InvalidArgumentException(sprintf('Invalid link type specified: %s', $type));
     }
 }

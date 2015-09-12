@@ -36,10 +36,9 @@ class Link extends BaseLink
      */
     public static function from_array(array $data)
     {
+        /** @var Link $link */
         $link = new static();
-        if (isset($data['url'])) {
-            $link->set_url($data['url']);
-        }
+        $link->set_from_array($data);
         return $link;
     }
 }

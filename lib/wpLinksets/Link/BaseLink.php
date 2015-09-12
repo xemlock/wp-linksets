@@ -2,6 +2,10 @@
 
 namespace wpLinksets\Link;
 
+/**
+ * Class BaseLink
+ * @package wpLinksets\Link
+ */
 abstract class BaseLink
 {
     /**
@@ -115,7 +119,7 @@ abstract class BaseLink
     }
 
     /**
-     * @param int|WP_Post $image
+     * @param int|\WP_Post $image
      */
     public function set_thumb_id($thumb_id)
     {

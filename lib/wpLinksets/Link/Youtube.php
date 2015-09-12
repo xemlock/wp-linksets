@@ -41,8 +41,7 @@ class Youtube extends BaseLink
      */
     public function get_url()
     {
-        $video_id = $this->get_video_id();
-        return sprintf('http://www.youtube.com/watch?v=%s', urlencode($video_id));
+        return sprintf('http://www.youtube.com/watch?v=%s', urlencode($this->_video_id));
     }
 
     /**
@@ -57,8 +56,7 @@ class Youtube extends BaseLink
             // - mqdefault (320x180px)
             // - hqdefault (480x360px)
             // - sddefault (640x480px)
-            $video_id = $this->get_video_id();
-            $thumb_url = sprintf('http://img.youtube.com/vi/%s/hqdefault.jpg', urlencode($video_id));
+            $thumb_url = sprintf('http://img.youtube.com/vi/%s/hqdefault.jpg', urlencode($this->_video_id));
         }
         return $thumb_url;
     }
@@ -69,7 +67,7 @@ class Youtube extends BaseLink
     public function to_array()
     {
         $array = parent::to_array();
-        $array['video_id'] = $this->get_video_id();
+        $array['video_id'] = $this->_video_id;
         return $array;
     }
 
@@ -79,10 +77,9 @@ class Youtube extends BaseLink
      */
     public static function from_array(array $data)
     {
+        /** @var Youtube $link */
         $link = new static();
-        if (isset($data['video_id'])) {
-            $link->set_video_id($data['video_id']);
-        }
+        $link->set_from_array($data);
         return $link;
     }
 }
