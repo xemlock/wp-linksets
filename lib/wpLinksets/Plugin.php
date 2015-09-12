@@ -107,6 +107,16 @@ class Plugin
         add_action('add_attachment', array($this, 'on_save_post'));
 
         add_action('the_post', array($this, 'on_post'));
+
+        add_action('admin_enqueue_scripts', function () {
+            // needed for find posts div
+            wp_enqueue_script('thickbox');
+            wp_enqueue_style('thickbox');
+
+            // findPosts
+            wp_enqueue_script('media');
+            wp_enqueue_script('wp-ajax-response');
+        });
     }
 
     /**
@@ -148,7 +158,7 @@ class Plugin
                 try {
                     $link = $this->_link_factory->create_link($data);
                     $linkset->add($link);
-                } catch (Exception $e) {
+                } catch (\Exception $e) {
                     // do nothing, or log error elsewhere
                 }
             }
@@ -159,8 +169,10 @@ class Plugin
             $post->{self::POST_PROPERTY} = $linkset;
         }
 
-        // echo @$meta;
-        // echo '<pre>', __METHOD__, "\n", print_r($post, 1); print_r($_POST); exit;
+        //echo 'isEnabled: ', (int) $this->is_enabled($post->post_type), "<br/>";
+        //echo 'isSubmitted:' , (int) isset($_POST[self::REQUEST_KEY]), "<br/>";
+        //echo @$meta;
+        //echo '<pre>', __METHOD__, "\n", print_r($post, 1); print_r($_POST); exit;
     }
 
     /**
@@ -212,7 +224,7 @@ class Plugin
             try {
                 $link = $this->_link_factory->create_link($val);
                 $linkset->add($link);
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 // do nothing, or log error elsewhere
             }
         }

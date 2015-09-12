@@ -80,9 +80,9 @@ abstract class BaseLink
      */
     public function set_date($date)
     {
-        $date = is_int($date) || is_float($date) ? $date : strtotime($date);
-        $data = $date === false ? time() : $date;
-        $this->_date = date('Y-m-d H:i:s', $date);
+        $time = is_int($date) || is_float($date) || ctype_digit($date) ? $date : strtotime($date);
+        $time = $time === false ? time() : $time;
+        $this->_date = date('Y-m-d H:i:s', $time);
     }
 
     /**
@@ -90,7 +90,7 @@ abstract class BaseLink
      */
     public function get_date()
     {
-        if ($this->_date === null) {
+        if (trim($this->_date) === '') {
             $this->set_date(time());
         }
         return $this->_date;

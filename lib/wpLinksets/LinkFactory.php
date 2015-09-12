@@ -10,6 +10,7 @@ class LinkFactory
      */
     protected $_type_classes = array(
         'link'    => '\\wpLinksets\\Link\\Link',
+        'post'    => '\\wpLinksets\\Link\\Post',
         'file'    => '\\wpLinksets\\Link\\File',
         'audio'   => '\\wpLinksets\\Link\\Audio',
         'youtube' => '\\wpLinksets\\Link\\Youtube',
@@ -18,6 +19,7 @@ class LinkFactory
     /**
      * @param string|array $type
      * @return Link\BaseLink|null
+     * @throws \InvalidArgumentException
      */
     public function create_link($type)
     {

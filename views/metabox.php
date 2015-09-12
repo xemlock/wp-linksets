@@ -72,6 +72,10 @@
     window.postAttachments = <?php echo wp_json_encode($linkset) ?>;
 </script>
 
+<script type="text/html" id="tmpl-wpPostAttachments-find-posts">
+    <?php find_posts_div(); ?>
+</script>
+
 <script type="text/html" id="tmpl-wpPostAttachments-main">
     <ul id="wpPostAttachments-list"></ul>
     <div id="wpPostAttachments-buttons">
@@ -79,28 +83,35 @@
         <button type="button" data-action="attach-file"><i class="fa fa-lg fa-file-text"></i> File</button>
         <button type="button" data-action="attach-audio"><i class="fa fa-lg fa-volume-up"></i> Audio</button>
         <button type="button" data-action="attach-youtube"><i class="fa fa-lg fa-youtube-play"></i> Youtube</button>
+        <button type="button" data-action="attach-post"><i class="fa fa-lg fa-file"></i> Post</button>
     </div>
 </script>
 
 <script type="text/html" id="tmpl-wpPostAttachments-item-link">
     <div>
         <span><i class="fa fa-link"></i> Website link</span>
-        <input type="hidden" name="type" value="link" />
         <input type="text" name="url" value="{{ data.url }}" placeholder="http://" />
+    </div>
+</script>
+
+<script type="text/html" id="tmpl-wpPostAttachments-item-post">
+    <div>
+        <span><i class="fa fa-file-text"></i> Post</span>
+        <input type="hidden" name="id" value="{{ data.id }}" />
     </div>
 </script>
 
 <script type="text/html" id="tmpl-wpPostAttachments-item-file">
     <div>
         <span><i class="fa fa-file-text"></i> File</span>
-        <input type="hidden" name="file_id" value="{{ data.file_id }}" />
+        <input type="hidden" name="id" value="{{ data.id }}" />
     </div>
 </script>
 
 <script type="text/html" id="tmpl-wpPostAttachments-item-audio">
     <div>
         <span><i class="fa fa-volume-up"></i> Audio file</span>
-        <input type="hidden" name="file_id" value="{{ data.file_id }}" />
+        <input type="hidden" name="id" value="{{ data.id }}" />
     </div>
 </script>
 
@@ -136,11 +147,11 @@
 <script type="text/html" id="tmpl-wpPostAttachments-item">
     <div>
         {{{ data.renderString('thumb', data) }}}
-        {{{ data.renderString('item-' + data.type) }}}
+        {{{ data.renderString('item-' + data.type, data) }}}
         <input type="hidden" name="type" value="{{ data.type }}" />
         <input type="text" name="title" value="{{ data.title }}" />
         <textarea name="description">{{ data.description }}</textarea>
-        <input type="hidden" name="date" value="{{ data.value }}" placeholder="YYYY-MM-DD HH:MM" />
+        <input type="hidden" name="date" value="{{ data.date }}" placeholder="YYYY-MM-DD HH:MM" />
         <button type="button" data-action="attachment-delete"><i class="fa fa-times"></i></button>
     </div>
 </script>

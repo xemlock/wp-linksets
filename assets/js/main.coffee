@@ -1,4 +1,5 @@
 $ = jQuery
+REQUEST_KEY = 'linkset'
 
 selectFile = (onSelect, options) ->
     if frame
@@ -28,6 +29,33 @@ selectFile = (onSelect, options) ->
         return
 
     frame.open()
+
+selectPost = (onSelect, options) ->
+    # depends on findPosts from admin/js/media.js
+    if $('#find-posts').size() == 0
+        $('body').append (render 'find-posts')
+
+    dialog = $('#find-posts')
+    dialog.find('#find-posts-submit')
+        .unbind 'click'
+        .bind 'click', (e) ->
+            e.preventDefault()
+
+            input = dialog.find('[name="found_post_id"]:checked')
+            if input.size()
+                label = dialog.find('label[for="' + input.attr('id') + '"]')
+                selected =
+                    id: parseInt(input.val(), 10)
+                    title: label.text()
+
+                $(this).unbind 'click'
+                findPosts.close()
+
+                onSelect selected if typeof onSelect == 'function'
+                return
+
+    findPosts.open()
+
 
 
 # perform additional logic when rendering attachment
@@ -71,13 +99,21 @@ attachFile = (type) ->
         # create box for each selected file
         _.each selected, (file) ->
             console?.log file
-            renderAttachment type ? 'file',
-               file: file
-               file_id: file.id
+            renderAttachment
+               type: type ? 'file'
+               id: file.id
                title: file.title
                description: file.description
                thumb_url: if file.sizes then file.sizes.thumbnail.url else file.thumb_src
+               file: file
     , {type: type, multiple: yes}
+
+attachPost = ->
+    selectPost (post) ->
+        renderAttachment
+            type: 'post'
+            id: post.id
+            title: post.title
 
 # render link
 renderRenamed = (name, data) ->
@@ -96,7 +132,7 @@ renderRenamed = (name, data) ->
 nameGenerator =
     _counter: 0
     name: (n) ->
-        "post_links[#{ @_counter }][#{ n }]"
+        REQUEST_KEY + "[#{ @_counter }][#{ n }]"
     next: ->
         ++@_counter
 
@@ -128,8 +164,7 @@ $ ->
 
     console?.log window.postAttachments
 
-    _.each window.postAttachments, (attachment) ->
-        renderAttachment attachment.type, attachment
+    _.each window.postAttachments, renderAttachment
 
     $('#post-attachments-metabox')
         .on 'click', '[data-action="attach-link"]', ->
@@ -146,6 +181,10 @@ $ ->
 
         .on 'click', '[data-action="attach-youtube"]', ->
             renderAttachment 'youtube'
+            return false
+
+        .on 'click', '[data-action="attach-post"]', ->
+            attachPost()
             return false
 
         .on 'click', '[data-action="attachment-delete"]', ->
@@ -198,6 +237,7 @@ $ ->
 
 
 @selectFile = selectFile
+@selectPost = selectPost
 
 @wpPostAttachments =
     render: render
