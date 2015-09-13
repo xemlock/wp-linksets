@@ -69,7 +69,9 @@
             $linkset[] = array_merge($link->to_array(), array('thumb_url' => $link->get_thumb_url('thumbnail')));
         }
     ?>
-    window.postAttachments = <?php echo wp_json_encode($linkset) ?>;
+
+    window.wpLinksets.POST_THUMBNAIL_URL_STRUCT = <?php echo wp_json_encode(0&&get_unified_post_thumbnail_url_structure()) ?>;
+    window.wpLinksets.linkset = <?php echo wp_json_encode($linkset) ?>;
 </script>
 
 <script type="text/html" id="tmpl-wpPostAttachments-find-posts">

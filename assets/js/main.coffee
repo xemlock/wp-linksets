@@ -1,6 +1,9 @@
 $ = jQuery
 REQUEST_KEY = 'linkset'
 
+wpLinksets =
+    POST_THUMBNAIL_URL_STRUCT: ''
+
 selectFile = (onSelect, options) ->
     if frame
         frame.open()
@@ -36,6 +39,7 @@ selectPost = (onSelect, options) ->
         $('body').append (render 'find-posts')
 
     dialog = $('#find-posts')
+
     dialog.find('#find-posts-submit')
         .unbind 'click'
         .bind 'click', (e) ->
@@ -53,6 +57,13 @@ selectPost = (onSelect, options) ->
 
                 onSelect selected if typeof onSelect == 'function'
                 return
+
+    dialog.find('#find-posts-close')
+        .unbind 'click'
+        .bind 'click', (e) ->
+            e.preventDefault()
+            findPosts.close()
+            return
 
     findPosts.open()
 
@@ -110,10 +121,14 @@ attachFile = (type) ->
 
 attachPost = ->
     selectPost (post) ->
+        thumbUrl = wpLinksets.POST_THUMBNAIL_URL_STRUCT
+            .replace '/%post_id%/g', post.id
+            .replace '/%size%/g', 'thumbnail'
         renderAttachment
             type: 'post'
             id: post.id
             title: post.title
+            thumb_url: thumbUrl
 
 # render link
 renderRenamed = (name, data) ->
@@ -162,9 +177,9 @@ $ ->
         renderString: renderString
     })
 
-    console?.log window.postAttachments
+    console?.log wpLinksets.linkset
 
-    _.each window.postAttachments, renderAttachment
+    _.each wpLinksets.linkset, renderAttachment
 
     $('#post-attachments-metabox')
         .on 'click', '[data-action="attach-link"]', ->
@@ -235,9 +250,8 @@ $ ->
 
     return
 
+wpLinksets.render = render
+wpLinksets.selectFile = selectFile
+wpLinksets.selectPost = selectPost
 
-@selectFile = selectFile
-@selectPost = selectPost
-
-@wpPostAttachments =
-    render: render
+@wpLinksets = wpLinksets
