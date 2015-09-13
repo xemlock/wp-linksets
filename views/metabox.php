@@ -70,7 +70,7 @@
         }
     ?>
 
-    window.wpLinksets.POST_THUMBNAIL_URL_STRUCT = <?php echo wp_json_encode(0&&get_unified_post_thumbnail_url_structure()) ?>;
+    window.wpLinksets.POST_THUMBNAIL_URL_STRUCT = <?php echo wp_json_encode(get_site_url() . get_unified_post_thumbnail_url_structure()) ?>;
     window.wpLinksets.linkset = <?php echo wp_json_encode($linkset) ?>;
 </script>
 

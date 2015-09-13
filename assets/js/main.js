@@ -133,7 +133,7 @@
   attachPost = function() {
     return selectPost(function(post) {
       var thumbUrl;
-      thumbUrl = wpLinksets.POST_THUMBNAIL_URL_STRUCT.replace('/%post_id%/g', post.id).replace('/%size%/g', 'thumbnail');
+      thumbUrl = wpLinksets.POST_THUMBNAIL_URL_STRUCT.replace(/%post_id%/g, post.id).replace(/%size%/g, 'thumbnail');
       return renderAttachment({
         type: 'post',
         id: post.id,

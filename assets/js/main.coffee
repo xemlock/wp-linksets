@@ -122,8 +122,8 @@ attachFile = (type) ->
 attachPost = ->
     selectPost (post) ->
         thumbUrl = wpLinksets.POST_THUMBNAIL_URL_STRUCT
-            .replace '/%post_id%/g', post.id
-            .replace '/%size%/g', 'thumbnail'
+            .replace /%post_id%/g, post.id
+            .replace /%size%/g, 'thumbnail'
         renderAttachment
             type: 'post'
             id: post.id
