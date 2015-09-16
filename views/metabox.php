@@ -4,7 +4,7 @@
 
 <style>
 .wppa-link {
-    padding: 10px;
+    padding: 10px 0;
     background: #fff;
 }
 .wppa-link + .wppa-link {
@@ -50,6 +50,8 @@
     border: 4px solid red;
     z-index: 2;
 }
+
+
 </style>
 
 <link href="<?php echo $this->get_plugin_url('assets/vendor/font-awesome/css/font-awesome.min.css') ?>" rel="stylesheet" type="text/css" />
@@ -107,6 +109,9 @@
     <div>
         <span><i class="fa fa-file-text"></i> File</span>
         <input type="hidden" name="id" value="{{ data.id }}" />
+        <# if (data.file) { #>
+            {{ data.file.filename }}
+        <# } #>
     </div>
 </script>
 
@@ -114,6 +119,9 @@
     <div>
         <span><i class="fa fa-volume-up"></i> Audio file</span>
         <input type="hidden" name="id" value="{{ data.id }}" />
+        <# if (data.file) { #>
+            {{ data.file.filename }}
+        <# } #>
     </div>
 </script>
 
@@ -126,34 +134,95 @@
 </script>
 
 <script type="text/html" id="tmpl-wpPostAttachments-undo">
-    <div>
+    <div class="linkset-item">
         Link removed
         <button type="button" data-action="delete-undo" title="Undo link removal"><i class="fa fa-undo"></i> Undo</button>
-        <button type="button" data-action="delete-confirm" title="Dismiss this notification"><i class="fa fa-times"></i></button>
+        <button class="linkset-item-delete" type="button" data-action="delete-confirm" title="<?php echo __('Dismiss') ?>">&times;</button>
     </div>
 </script>
 
-<script type="text/html" id="tmpl-wpPostAttachments-thumb">
-    <div class="wppl-thumb">
-        <div class="wppl-thumb-inner" data-action="thumb-select">
-            <input type="hidden" name="thumb_id" value="{{ data.thumb_id }}" />
-            <# if (data.thumb_url) { #>
-                <img src="{{ data.thumb_url }}" alt="" />
-            <# } else { #>
-                <img src="http://placehold.it/150x150" alt="" />
-            <# } #>
-        </div>
-    </div>
-</script>
+<style>
+.linkset-item {
+    position: relative;
+    padding: 10px 32px 10px 10px;
+}
+.linkset-item:before,
+.linkset-item:after {
+    content: ' ';
+    display: table;
+}
+.linkset-item:after {
+    clear: both;
+}
+
+.linkset-item-thumb {
+    width: 150px;
+    height: 150px;
+    float: left;
+    background: #eee url('http://placehold.it/150x150') no-repeat 50% 50%;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1) inset;
+}
+.linkset-item-type-file .linkset-item-thumb {
+    background-image: url(<?php echo get_site_url() ?>/wp-includes/images/media/document.png);
+}
+
+.linkset-item-thumb img {
+    height: 100%;
+    width: 100%;
+}
+.linkset-item-data {
+    padding-left: 160px;
+}
+.linkset-item-data input[type="text"],
+.linkset-item-data textarea {
+    display: block;
+    width: 100%;
+    padding: 6px;
+    margin: 0 0 4px;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    min-width: 100%;
+    max-width: 100%;
+}
+.linkset-item-delete {
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 32px;
+    height: 32px;
+}
+
+.postbox#post_attachments .inside {
+    padding: 0;
+    margin: 0;
+}
+</style>
 
 <script type="text/html" id="tmpl-wpPostAttachments-item">
-    <div>
-        {{{ data.renderString('thumb', data) }}}
-        {{{ data.renderString('item-' + data.type, data) }}}
-        <input type="hidden" name="type" value="{{ data.type }}" />
-        <input type="text" name="title" value="{{ data.title }}" />
-        <textarea name="description">{{ data.description }}</textarea>
-        <input type="hidden" name="date" value="{{ data.date }}" placeholder="YYYY-MM-DD HH:MM" />
-        <button type="button" data-action="attachment-delete"><i class="fa fa-times"></i></button>
+    <div class="linkset-item linkset-item-type-{{ data.type }}">
+        <div class="linkset-item-thumb">
+            <div class="" data-action="thumb-select">
+                <input type="hidden" name="thumb_id" value="{{ data.thumb_id }}" />
+                <# if (data.thumb_url) { #>
+                    <img src="{{ data.thumb_url }}" alt="" />
+                <# } else { #>
+                    <img src="<?php echo $this->get_plugin_url('assets/img/blank.png') ?>" alt="" />
+                <# } #>
+            </div>
+        </div>
+        <div class="linkset-item-data">
+            {{{ data.renderString('item-' + data.type, data) }}}
+            <input type="hidden" name="type" value="{{ data.type }}" />
+
+            <label><?php echo __('Title') ?></label>
+            <input type="text" name="title" value="{{ data.title }}" />
+
+            <label><?php echo __('Description') ?></label>
+            <textarea name="description">{{ data.description }}</textarea>
+
+            <input type="hidden" name="date" value="{{ data.date }}" placeholder="YYYY-MM-DD HH:MM" />
+        </div>
+        <button class="linkset-item-delete" type="button" data-action="attachment-delete" title="<?php echo __('Remove') ?>">&times;</button>
     </div>
 </script>
