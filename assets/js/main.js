@@ -254,8 +254,7 @@
         $(this).remove();
         list = $('#wpPostAttachments-list');
         if (list.children(':not(.linkset-item-empty)').size() === 0) {
-          list.addClass(NO_ITEMS);
-          return list.find('.linkset-item-empty').hide().slideDown();
+          return list.addClass(NO_ITEMS);
         }
       });
       return false;

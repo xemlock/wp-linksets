@@ -118,7 +118,7 @@
   display: none;
   text-align: center;
 }
-.no-items > .linkset-item-empty {
+.no-items .linkset-item-empty {
   display: block;
 }
 .linkset-item-thumb-actions {

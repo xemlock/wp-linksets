@@ -64,7 +64,7 @@
     <div>
         <span><i class="fa fa-youtube-play"></i> Youtube Video</span>
         <input type="hidden" name="type" value="youtube" />
-        <input type="text" name="video_id" value="{{ data.video_id }}" />
+        <input type="text" name="video_id" value="{{ data.video_id }}" placeholder="Video ID or URL at YouTube"/>
     </div>
 </script>
 
