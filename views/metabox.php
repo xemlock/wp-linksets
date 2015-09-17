@@ -1,77 +1,19 @@
 <?php defined('ABSPATH') || die(); ?>
-<?php // ini_set('display_errors', 1);error_reporting(-1); ?>
 <?php /** @var \wpLinksets\Plugin $this */ ?>
 
-<style>
-.wppa-link {
-    padding: 10px 0;
-    background: #fff;
-}
-.wppa-link + .wppa-link {
-    border-top: 1px solid #ccc;
-}
-.wppa-link.ui-sortable-helper {
-    border-top: none;
-    box-shadow: 0 0 10px rgba(0, 0, 0, .15);
-}
-.wppa-url {
-
-}
-#wpPostAttachments-buttons {
-    background: #eee;
-    padding: 10px;
-}
-
-.wppl-thumb {
-    border:1px solid #ccc;width:150px;height:150px;text-align:center;overflow:hidden;
-}
-.wppl-thumb-inner {
-    width:300px;
-    height:100%;
-    margin-left:-75px;
-    position: relative;
-    z-index: 0;
-}
-.wppl-thumb img {
-    max-height: 100%;
-    max-width: 100%;
-}
-.wppl-thumb-inner:hover {
-    cursor: pointer;
-}
-.wppl-thumb-inner:hover:before {
-    content: '';
-    display: block;
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    border: 4px solid red;
-    z-index: 2;
-}
-
-
-</style>
-
-<link href="<?php echo $this->get_plugin_url('assets/vendor/font-awesome/css/font-awesome.min.css') ?>" rel="stylesheet" type="text/css" />
-<script><?php require $this->get_plugin_path('assets/js/main.js') ?></script>
-<script>window.moment||document.write('<script src="<?php echo $this->get_plugin_url('assets/vendor/moment/min/moment.min.js') ?>"><\/script>')</script>
-
-<input type="hidden" name="custom_meta_box_nonce" value="<?php echo wp_create_nonce(basename(__FILE__)) ?>" />
+<input type="hidden" name="custom_meta_box_nonce" value="<?php echo $this->get_nonce() ?>" />
 
 <div id="post-attachments-metabox">
-    Javascript is required for post attachments functionality
+    <?php echo __('Javascript is required for post attachments functionality'); ?>
 </div>
 
+<?php
+    $linkset = array();
+    foreach ($this->get_linkset($post) as $link) {
+        $linkset[] = array_merge($link->to_array(), array('thumb_url' => $link->get_thumb_url('thumbnail')));
+    }
+?>
 <script>
-    <?php
-        $linkset = array();
-        foreach ($this->get_linkset($post) as $link) {
-            $linkset[] = array_merge($link->to_array(), array('thumb_url' => $link->get_thumb_url('thumbnail')));
-        }
-    ?>
-
     window.wpLinksets.POST_THUMBNAIL_URL_STRUCT = <?php echo wp_json_encode(get_site_url() . get_unified_post_thumbnail_url_structure()) ?>;
     window.wpLinksets.linkset = <?php echo wp_json_encode($linkset) ?>;
 </script>
@@ -81,13 +23,16 @@
 </script>
 
 <script type="text/html" id="tmpl-wpPostAttachments-main">
-    <ul id="wpPostAttachments-list"></ul>
+    <ul id="wpPostAttachments-list" class="linkset-list no-items">
+        <li class="linkset-item linkset-item-empty">
+            <?php echo __('No links. Add links using the buttons below') ?>
+        </li>
+    </ul>
     <div id="wpPostAttachments-buttons">
         <button type="button" data-action="attach-link"><i class="fa fa-lg fa-link"></i> Link</button>
-        <button type="button" data-action="attach-file"><i class="fa fa-lg fa-file-text"></i> File</button>
-        <button type="button" data-action="attach-audio"><i class="fa fa-lg fa-volume-up"></i> Audio</button>
-        <button type="button" data-action="attach-youtube"><i class="fa fa-lg fa-youtube-play"></i> Youtube</button>
         <button type="button" data-action="attach-post"><i class="fa fa-lg fa-file"></i> Post</button>
+        <button type="button" data-action="attach-file"><i class="fa fa-lg fa-file-text"></i> File</button>
+        <button type="button" data-action="attach-youtube"><i class="fa fa-lg fa-youtube-play"></i> Youtube</button>
     </div>
 </script>
 
@@ -115,16 +60,6 @@
     </div>
 </script>
 
-<script type="text/html" id="tmpl-wpPostAttachments-item-audio">
-    <div>
-        <span><i class="fa fa-volume-up"></i> Audio file</span>
-        <input type="hidden" name="id" value="{{ data.id }}" />
-        <# if (data.file) { #>
-            {{ data.file.filename }}
-        <# } #>
-    </div>
-</script>
-
 <script type="text/html" id="tmpl-wpPostAttachments-item-youtube">
     <div>
         <span><i class="fa fa-youtube-play"></i> Youtube Video</span>
@@ -137,78 +72,36 @@
     <div class="linkset-item">
         Link removed
         <button type="button" data-action="delete-undo" title="Undo link removal"><i class="fa fa-undo"></i> Undo</button>
-        <button class="linkset-item-delete" type="button" data-action="delete-confirm" title="<?php echo __('Dismiss') ?>">&times;</button>
+
+        <button class="linkset-item-delete" type="button" data-action="delete-confirm" title="<?php echo __('Dismiss') ?>">
+            <i class="dashicons dashicons-no"></i>
+        </button>
+
     </div>
 </script>
 
-<style>
-.linkset-item {
-    position: relative;
-    padding: 10px 32px 10px 10px;
-}
-.linkset-item:before,
-.linkset-item:after {
-    content: ' ';
-    display: table;
-}
-.linkset-item:after {
-    clear: both;
-}
-
-.linkset-item-thumb {
-    width: 150px;
-    height: 150px;
-    float: left;
-    background: #eee url('http://placehold.it/150x150') no-repeat 50% 50%;
-    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1) inset;
-}
-.linkset-item-type-file .linkset-item-thumb {
-    background-image: url(<?php echo get_site_url() ?>/wp-includes/images/media/document.png);
-}
-
-.linkset-item-thumb img {
-    height: 100%;
-    width: 100%;
-}
-.linkset-item-data {
-    padding-left: 160px;
-}
-.linkset-item-data input[type="text"],
-.linkset-item-data textarea {
-    display: block;
-    width: 100%;
-    padding: 6px;
-    margin: 0 0 4px;
-    -moz-box-sizing: border-box;
-    -webkit-box-sizing: border-box;
-    box-sizing: border-box;
-    min-width: 100%;
-    max-width: 100%;
-}
-.linkset-item-delete {
-    position: absolute;
-    right: 0;
-    top: 0;
-    width: 32px;
-    height: 32px;
-}
-
-.postbox#post_attachments .inside {
-    padding: 0;
-    margin: 0;
-}
-</style>
-
 <script type="text/html" id="tmpl-wpPostAttachments-item">
-    <div class="linkset-item linkset-item-type-{{ data.type }}">
+    <# var has_thumb = data.thumb_id ? 'has-thumb' : '' #>
+
+    <div class="linkset-item linkset-item-type-{{ data.type }} {{ has_thumb }}">
         <div class="linkset-item-thumb">
-            <div class="" data-action="thumb-select">
+            <div class="">
                 <input type="hidden" name="thumb_id" value="{{ data.thumb_id }}" />
                 <# if (data.thumb_url) { #>
                     <img src="{{ data.thumb_url }}" alt="" />
                 <# } else { #>
                     <img src="<?php echo $this->get_plugin_url('assets/img/blank.png') ?>" alt="" />
                 <# } #>
+            </div>
+            <div class="linkset-item-thumb-actions">
+                <div class="linkset-item-thumb-actions-inner">
+                    <a class="linkset-item-thumb-action linkset-item-thumb-action-edit" href="#" data-action="thumb-select">
+                        <i class="dashicons dashicons-edit"></i> <?php echo __('Edit') ?>
+                    </a>
+                    <a class="linkset-item-thumb-action linkset-item-thumb-action-delete" href="#" data-action="thumb-delete">
+                        <i class="dashicons dashicons-no"></i> <?php echo __('Delete') ?>
+                    </a>
+                </div>
             </div>
         </div>
         <div class="linkset-item-data">
@@ -223,6 +116,8 @@
 
             <input type="hidden" name="date" value="{{ data.date }}" placeholder="YYYY-MM-DD HH:MM" />
         </div>
-        <button class="linkset-item-delete" type="button" data-action="attachment-delete" title="<?php echo __('Remove') ?>">&times;</button>
+        <button class="linkset-item-delete" type="button" data-action="attachment-delete" title="<?php echo __('Remove') ?>">
+            <i class="dashicons dashicons-no"></i>
+        </button>
     </div>
 </script>

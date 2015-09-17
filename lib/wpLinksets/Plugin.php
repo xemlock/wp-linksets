@@ -108,15 +108,21 @@ class Plugin
 
         add_action('the_post', array($this, 'on_post'));
 
-        add_action('admin_enqueue_scripts', function () {
-            // needed for find posts div
-            wp_enqueue_script('thickbox');
-            wp_enqueue_style('thickbox');
+        add_action('admin_enqueue_scripts', array($this, 'on_admin_enqueue_scripts'));
+    }
 
-            // findPosts
-            wp_enqueue_script('media');
-            wp_enqueue_script('wp-ajax-response');
-        });
+    public function on_admin_enqueue_scripts()
+    {
+        // needed for find posts div
+        // wp_enqueue_script('thickbox');
+        // wp_enqueue_style('thickbox');
+
+        // findPosts
+        // wp_enqueue_script('media');
+        // wp_enqueue_script('wp-ajax-response');
+
+        wp_enqueue_style('linkset', $this->get_plugin_url('assets/css/style.css'), array('dashicons', 'thickbox'));
+        wp_enqueue_script('linkset', $this->get_plugin_url('assets/js/main.js'), array('media', 'wp-ajax-response', 'thickbox'));
     }
 
     /**
@@ -125,7 +131,7 @@ class Plugin
     public function on_meta_boxes()
     {
         foreach ($this->get_post_types() as $post_type) {
-            add_meta_box('post_attachments', 'Linksets', array($this, 'render_metabox'), $post_type, 'normal', 'default', null);
+            add_meta_box('post_attachments', 'Linkset', array($this, 'render_metabox'), $post_type, 'normal', 'default', null);
         }
     }
 
@@ -163,7 +169,9 @@ class Plugin
                 }
             }
 
-            $meta = wp_json_encode($linkset->to_array());
+            // update_post_meta() fails to handle JSON encoded UTF-8 characters,
+            // so linkset is serialized via serialize()
+            $meta = serialize($linkset->to_array());
             update_post_meta($post_id, self::META_KEY, $meta);
 
             $post->{self::POST_PROPERTY} = $linkset;
@@ -199,6 +207,11 @@ class Plugin
         }
     }
 
+    public function get_nonce()
+    {
+        return wp_create_nonce(basename(__FILE__));
+    }
+
     /**
      * Prior to building linkset data is filtered by get_linkset filter.
      *
@@ -216,16 +229,25 @@ class Plugin
         }
 
         $meta = get_post_meta((int) $post_id, self::META_KEY, true);
-        $data = (array) json_decode($meta, true);
-        $data = apply_filters('get_linkset', $data);
+        $data = unserialize($meta);
+
+        if (!is_array($data) && function_exists('json_decode')) {
+            // backwards compatibility
+            $data = (array) json_decode($meta, true);
+        }
 
         $linkset = new Linkset();
-        foreach ((array) $data as $val) {
-            try {
-                $link = $this->_link_factory->create_link($val);
-                $linkset->add($link);
-            } catch (\Exception $e) {
-                // do nothing, or log error elsewhere
+
+        if (is_array($data)) {
+            $data = apply_filters('get_linkset', $data);
+
+            foreach ((array) $data as $val) {
+                try {
+                    $link = $this->_link_factory->create_link($val);
+                    $linkset->add($link);
+                } catch (\Exception $e) {
+                    // do nothing, or log error elsewhere
+                }
             }
         }
 

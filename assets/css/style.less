@@ -1,0 +1,200 @@
+
+.wppa-link {
+    padding: 10px 0;
+    background: #fff;
+}
+.wppa-link + .wppa-link {
+    border-top: 1px solid #ccc;
+}
+.wppa-link.ui-sortable-helper {
+    border-top: none;
+    box-shadow: 0 0 10px rgba(0, 0, 0, .15);
+}
+.wppa-url {
+
+}
+#wpPostAttachments-buttons {
+    background: #eee;
+    padding: 10px;
+}
+
+.wppl-thumb {
+    border:1px solid #ccc;width:150px;height:150px;text-align:center;overflow:hidden;
+}
+.wppl-thumb-inner {
+    width:300px;
+    height:100%;
+    margin-left:-75px;
+    position: relative;
+    z-index: 0;
+}
+.wppl-thumb img {
+    max-height: 100%;
+    max-width: 100%;
+}
+.wppl-thumb-inner:hover {
+    cursor: pointer;
+}
+.wppl-thumb-inner:hover:before {
+    content: '';
+    display: block;
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    border: 4px solid red;
+    z-index: 2;
+}
+
+.linkset-item {
+    position: relative;
+    padding: 10px 32px 10px 10px;
+}
+.linkset-item:before,
+.linkset-item:after {
+    content: ' ';
+    display: table;
+}
+.linkset-item:after {
+    clear: both;
+}
+
+.linkset-item-thumb {
+    width: 150px;
+    height: 150px;
+    float: left;
+    background: #eee url('http://placehold.it/150x150') no-repeat 50% 50%;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
+}
+
+.linkset-item-thumb img {
+    height: 100%;
+    width: 100%;
+}
+.linkset-item-data {
+    padding-left: 160px;
+
+    input[type="text"],
+    textarea {
+        display: block;
+        width: 100%;
+        padding: 6px;
+        margin: 0 0 4px;
+        -moz-box-sizing: border-box;
+        -webkit-box-sizing: border-box;
+        box-sizing: border-box;
+        min-width: 100%;
+        max-width: 100%;
+    }
+}
+
+// item delete button
+.linkset-item-delete {
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 36px;
+    height: 36px;
+    cursor: pointer;
+    color: #aaa;
+    text-align: center;
+    font-size: 15px;
+    border: none;
+    background: 0;
+    margin: 0;
+    padding: 0;
+
+    &:hover {
+        color: #777;
+    }
+
+    .dashicons-no {
+        display: block;
+    }
+}
+
+.postbox#post_attachments .inside {
+    padding: 0;
+    margin: 0;
+}
+
+.linkset-list {
+    margin: 0;
+    padding: 0;
+}
+.linkset-item-empty {
+    display: none;
+    text-align: center;
+}
+
+.no-items > .linkset-item-empty {
+    display: block;
+}
+
+.linkset-item-thumb-actions {
+    position: absolute;
+    bottom: -3em;
+    left: 0;
+    width: 100%;
+    color: #fff;
+    background: #222;
+    background: #f7f7f7;
+    border-top: 1px solid #ccc;
+    transition: all 250ms;
+
+    box-shadow: 0 1px 0 #fff inset;
+}
+.linkset-item-thumb:hover .linkset-item-thumb-actions {
+    opacity: 1;
+    bottom: 0;
+}
+.linkset-item-thumb-actions-inner {
+}
+.linkset-item-thumb-action {
+    float: left;
+    font-size: 1.05em;
+    text-align: center;
+    line-height: 1.3;
+    color: #21759b;
+    padding: 8px 6px;
+    text-decoration: none;
+
+    .dashicons {
+        margin-right: -0.15em; // compensate space after icon
+    }
+}
+.linkset-item-thumb-action-delete {
+    display: none;
+    color: #bc0b0b;
+    float: right;
+}
+.linkset-item-thumb-action:hover,
+.linkset-item-thumb-action:focus {
+    color: #298cba;
+    color: #d54e21;
+    box-shadow: none;
+    outline: none;
+}
+
+.linkset-item-thumb-action-delete:hover {
+    color: red;
+}
+.linkset-item.has-thumb .linkset-item-thumb-action-delete {
+    display: block;
+}
+
+/* fix dashicon sizing */
+.linkset-item {
+    .dashicons,
+    .dashicons-before:before {
+        font-size: 1.25em; // dashicons are not very much to scale...
+        line-heigth: normal;
+        width: auto;
+        height: auto;
+        vertical-align: middle;
+        margin-top: -.05em;
+    }
+}

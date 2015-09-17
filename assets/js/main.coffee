@@ -1,5 +1,6 @@
 $ = jQuery
 REQUEST_KEY = 'linkset'
+NO_ITEMS = 'no-items'
 
 wpLinksets =
     POST_THUMBNAIL_URL_STRUCT: ''
@@ -11,17 +12,21 @@ selectFile = (onSelect, options) ->
 
     # Sets up the media library frame
     frame = wp.media
-         title: options.title or 'Select file',
-         button: {text: 'Select'},
-         library: {type: options.type},
+         title: options.title or 'Select file'
+         button: {text: 'Select'}
+         library: {type: options.type}
          multiple : options.multiple
 
     frame.on 'open', ->
-        selection = frame.state().get('selection')
-        # wp.media.attachment input.val()
+        if options.selected
+            selection = frame.state().get('selection')
+            file = wp.media.attachment options.selected;
+            file.fetch()
+            console.log 'fetched: ', file
 
-        #attachment.fetch()
-        #selection.add if attachment then [attachment] else []
+            if file
+                selection.add [file]
+
         return
 
     # Runs when an image is selected
@@ -95,9 +100,14 @@ renderAttachment = (data) ->
 
     type = data.type
 
+    list = $ '#wpPostAttachments-list'
+
     li = $ '<li class="wppa-link" />'
-    li.appendTo '#wpPostAttachments-list'
+    li.appendTo list
     li.append (el = renderRenamed 'item', data)
+    li.find('.linkset-item').data 'linksetItem', data
+
+    list.removeClass NO_ITEMS
 
     if typeof renderers[type] == 'function'
         renderers[type] el, data
@@ -227,22 +237,49 @@ $ ->
             li = $(this).closest('li')
             li.animate
                 outerHeight: 0
+                height: 0
                 opacity: 0
-            , -> $(this).remove()
+                paddingTop: 0
+                paddingBottom: 0
+
+            , ->
+                $(this).remove()
+
+                list = $ '#wpPostAttachments-list'
+                if list.children(':not(.linkset-item-empty)').size() == 0
+                    list.addClass NO_ITEMS
+                    list.find('.linkset-item-empty').hide().slideDown();
+
+
             return false
 
         .on 'click', '[data-action="thumb-select"]', ->
+            # detect selected image
+            item = $(this).closest('.linkset-item')
+            thumb = item.find('[name*="thumb_id"]').val()
+
             selectFile (selection) =>
                 selectedImage = selection[0]
                 console?.log selectedImage, this
                 # selectedImage.url
                 thumb = if selectedImage.sizes.thumbnail then selectedImage.sizes.thumbnail else selectedImage.sizes.full
-                $(this).find('img').attr('src', thumb.url)
-                $(this).find('[name*="thumb_id"]').val(selectedImage.id)
+
+                item.find('img').attr('src', thumb.url)
+                item.find('[name*="thumb_id"]').val(selectedImage.id)
+                item.addClass('has-thumb')
             ,
                 type: 'image'
                 multiple: false
+                selected: thumb
 
+            return false
+
+        .on 'click', '[data-action="thumb-delete"]', ->
+            item = $(this).closest('.linkset-item')
+            item.find('img').attr('src', '')
+            item.find('[name*="thumb_id"]').val('')
+            item.removeClass('has-thumb')
+            return false
 
 
 
