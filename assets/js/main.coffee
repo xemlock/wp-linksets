@@ -109,7 +109,7 @@ renderAttachment = (data) ->
     model = $.extend true, {}, data
     li.data 'linksetItem', model
 
-    list.removeClass NO_ITEMS
+    list.closest('.linkset-container').removeClass NO_ITEMS
 
     if typeof renderers[type] == 'function'
         renderers[type] li, data
@@ -249,7 +249,7 @@ $ ->
 
                 list = $ '#wpPostAttachments-list'
                 if list.children(':not(.linkset-item-empty)').size() == 0
-                    list.addClass NO_ITEMS
+                    list.closest('.linkset-container').addClass NO_ITEMS
 
 
             return false
@@ -319,7 +319,8 @@ $ ->
             return false
 
 
-    $('#wpPostAttachments-list').sortable()
+    $('#wpPostAttachments-list').sortable
+        items: '.linkset-item:not(.linkset-item-empty)'
 
     return
 

@@ -115,7 +115,7 @@
     li.appendTo(list);
     model = $.extend(true, {}, data);
     li.data('linksetItem', model);
-    list.removeClass(NO_ITEMS);
+    list.closest('.linkset-container').removeClass(NO_ITEMS);
     if (typeof renderers[type] === 'function') {
       renderers[type](li, data);
     }
@@ -254,7 +254,7 @@
         $(this).remove();
         list = $('#wpPostAttachments-list');
         if (list.children(':not(.linkset-item-empty)').size() === 0) {
-          return list.addClass(NO_ITEMS);
+          return list.closest('.linkset-container').addClass(NO_ITEMS);
         }
       });
       return false;
@@ -314,7 +314,9 @@
       item.removeData('thumb_restore');
       return false;
     });
-    $('#wpPostAttachments-list').sortable();
+    $('#wpPostAttachments-list').sortable({
+      items: '.linkset-item:not(.linkset-item-empty)'
+    });
   });
 
   wpLinksets.render = render;

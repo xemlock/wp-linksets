@@ -23,11 +23,13 @@
 </script>
 
 <script type="text/html" id="tmpl-wpPostAttachments-main">
-    <ul id="wpPostAttachments-list" class="linkset-list no-items">
-        <li class="linkset-item linkset-item-empty">
+    <div class="linkset-container no-items">
+        <ul id="wpPostAttachments-list" class="linkset-list">
+        </ul>
+        <p class="linkset-empty">
             <?php echo __('No links. Add links using the buttons below') ?>
-        </li>
-    </ul>
+        </p>
+    </div>
     <div id="wpPostAttachments-buttons">
         <button type="button" data-action="attach-link"><i class="fa fa-lg fa-link"></i> Link</button>
         <button type="button" data-action="attach-post"><i class="fa fa-lg fa-file"></i> Post</button>

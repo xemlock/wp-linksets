@@ -1,14 +1,3 @@
-.wppa-link {
-  padding: 10px 0;
-  background: #fff;
-}
-.wppa-link + .wppa-link {
-  border-top: 1px solid #ccc;
-}
-.wppa-link.ui-sortable-helper {
-  border-top: none;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
-}
 #wpPostAttachments-buttons {
   background: #eee;
   padding: 10px;
@@ -48,6 +37,22 @@
 .linkset-item {
   position: relative;
   padding: 10px 32px 10px 10px;
+  margin: 0;
+  background: #fff;
+}
+.linkset-item + .linkset-item {
+  border-top: 1px solid #eee;
+}
+.linkset-item.ui-sortable-helper {
+  border-top: none;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+}
+.linkset-item.ui-sortable-helper:first-child + .ui-sortable-placeholder {
+  border-top: none;
+}
+.linkset-item.ui-sortable-placeholder {
+  visibility: visible !important;
+  background: #f6f6f6;
 }
 /* fix dashicon sizing */
 .linkset-item .dashicons,
@@ -126,11 +131,11 @@
   margin: 0;
   padding: 0;
 }
-.linkset-item-empty {
+.linkset-empty {
   display: none;
   text-align: center;
 }
-.no-items .linkset-item-empty {
+.no-items .linkset-empty {
   display: block;
 }
 .linkset-item-thumb-actions {
