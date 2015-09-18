@@ -27,26 +27,7 @@ class Youtube extends BaseLink
      */
     public function set_video_id($video_id)
     {
-        $video_id = trim($video_id);
-
-
-        if (!preg_match('/^' . self::VIDEO_ID_REGEX . '$/', $video_id)) {
-            // Try to extract Video ID from the assumed URL. Known patterns:
-            // www.youtube.com/watch?v=VIDEO_ID
-            // www.youtube.com/v/VIDEO_ID
-            // www.youtube.com/embed/VIDEO_ID
-            // youtu.be/VIDEO_ID
-
-            if (preg_match('/v=(' . self::VIDEO_ID_REGEX . ')/', $video_id, $match)) {
-                $video_id = $match[1];
-            } elseif (preg_match('/(v|embed)\/(' . self::VIDEO_ID_REGEX . ')/', $video_id, $match)) {
-                $video_id = $match[2];
-            } elseif (preg_match('/youtu\.be\/(' . self::VIDEO_ID_REGEX . ')/', $video_id, $match)) {
-                $video_id = $match[1];
-            }
-        }
-
-        $this->_video_id = $video_id;
+        $this->_video_id = self::extract_video_id($video_id);
     }
 
     /**
@@ -102,5 +83,37 @@ class Youtube extends BaseLink
         $link = new static();
         $link->set_from_array($data);
         return $link;
+    }
+
+    /**
+     * @param string $video_id
+     * @return string
+     */
+    public static function extract_video_id($video_id)
+    {
+        $video_id = trim($video_id);
+
+        if (!preg_match('/^' . self::VIDEO_ID_REGEX . '$/', $video_id)) {
+            // Try to extract Video ID from the assumed URL
+            // www.youtube.com/watch?v=VIDEO_ID
+            // www.youtube.com/v/VIDEO_ID
+            // www.youtube.com/embed/VIDEO_ID
+            // youtu.be/VIDEO_ID
+
+            $patterns = array(
+                '/[?&]v=(?P<id>' . self::VIDEO_ID_REGEX . ')/',         // regular
+                '/\/(v|embed)\/(?P<id>' . self::VIDEO_ID_REGEX . ')/',  // embed
+                '/youtu\.be\/(?P<id>' . self::VIDEO_ID_REGEX . ')/',    // shortened
+            );
+
+            foreach ($patterns as $pattern) {
+                if (preg_match($pattern, $video_id, $match)) {
+                    $video_id = $match['id'];
+                    break;
+                }
+            }
+        }
+
+        return $video_id;
     }
 }
