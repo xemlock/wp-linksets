@@ -51,6 +51,23 @@
     position: relative;
     padding: 10px 32px 10px 10px;
 }
+
+
+/* fix dashicon sizing */
+.linkset-item {
+    .dashicons,
+    .dashicons-before:before {
+        font-size: 1.25em; // dashicons are not very much to scale...
+        line-heigth: normal;
+        width: auto;
+        height: auto;
+        vertical-align: middle;
+        margin: 0;
+        margin-top: -.05em;
+        padding: 0;
+    }
+}
+
 .linkset-item:before,
 .linkset-item:after {
     content: ' ';
@@ -134,9 +151,19 @@
     display: block;
 }
 
+@thumb-action-line-height:      1.3;
+@thumb-action-padding-top:      8px;
+@thumb-action-padding-bottom:   8px;
+@thumb-action-font-size:        14px;
+@thumb-action-icon-size:        24px;
+
 .linkset-item-thumb-actions {
     position: absolute;
-    bottom: -3em;
+    bottom: -(
+        @thumb-action-padding-top + @thumb-action-padding-bottom +
+        @thumb-action-font-size * @thumb-action-line-height +
+        @thumb-action-icon-size
+    );
     left: 0;
     width: 100%;
     color: #fff;
@@ -146,55 +173,65 @@
     transition: all 250ms;
 
     box-shadow: 0 1px 0 #fff inset;
-}
-.linkset-item-thumb:hover .linkset-item-thumb-actions {
-    opacity: 1;
-    bottom: 0;
-}
-.linkset-item-thumb-actions-inner {
-}
-.linkset-item-thumb-action {
-    float: left;
-    font-size: 1.05em;
-    text-align: center;
-    line-height: 1.3;
-    color: #21759b;
-    padding: 8px 6px;
-    text-decoration: none;
 
-    .dashicons {
-        margin-right: -0.15em; // compensate space after icon
+    .linkset-item-thumb:hover & {
+        opacity: 1;
+        bottom: 0;
     }
 }
-.linkset-item-thumb-action-delete {
-    display: none;
-    color: #bc0b0b;
-    float: right;
+
+.linkset-item-thumb-action {
+    float: left;
+    font-size: @thumb-action-font-size;
+    text-align: center;
+    line-height: @thumb-action-line-height;
+    padding: @thumb-action-padding-top 0 @thumb-action-padding-bottom;
+    text-decoration: none;
+    color: #21759b;
+
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+
+    // single action when no thumbnail is present
+    width: 100%;
+
+    // and when the thumb is present two actions are visible
+    // or when is not present, but 'Restore' action is available
+    .has-thumb &,
+    .has-thumb-restore & {
+        width: 50%;
+    }
+
+    &:hover,
+    &:focus {
+        color: #298cba;
+        color: #d54e21;
+        box-shadow: none;
+        outline: none;
+    }
+
+    .dashicons {
+        display: block;
+        font-size: @thumb-action-icon-size;
+        line-height: 1;
+    }
 }
-.linkset-item-thumb-action:hover,
-.linkset-item-thumb-action:focus {
-    color: #298cba;
-    color: #d54e21;
-    box-shadow: none;
-    outline: none;
+
+.linkset-item-thumb-action-delete,
+.linkset-item-thumb-action-restore {
+    display: none;
+}
+
+.linkset-item {
+    &.has-thumb .linkset-item-thumb-action-delete,
+    &.has-thumb-restore .linkset-item-thumb-action-restore
+    {
+        // color: #bc0b0b;
+        display: block;
+    }
 }
 
 .linkset-item-thumb-action-delete:hover {
-    color: red;
-}
-.linkset-item.has-thumb .linkset-item-thumb-action-delete {
-    display: block;
-}
-
-/* fix dashicon sizing */
-.linkset-item {
-    .dashicons,
-    .dashicons-before:before {
-        font-size: 1.25em; // dashicons are not very much to scale...
-        line-heigth: normal;
-        width: auto;
-        height: auto;
-        vertical-align: middle;
-        margin-top: -.05em;
-    }
+    // color: red;
 }

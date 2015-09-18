@@ -103,7 +103,7 @@
   };
 
   renderAttachment = function(data) {
-    var el, li, list, type;
+    var li, list, model, type;
     if (typeof data === 'string') {
       data = {
         type: data
@@ -111,13 +111,13 @@
     }
     type = data.type;
     list = $('#wpPostAttachments-list');
-    li = $('<li class="wppa-link" />');
+    li = renderRenamed('item', data);
     li.appendTo(list);
-    li.append((el = renderRenamed('item', data)));
-    li.find('.linkset-item').data('linksetItem', data);
+    model = $.extend(true, {}, data);
+    li.data('linksetItem', model);
     list.removeClass(NO_ITEMS);
     if (typeof renderers[type] === 'function') {
-      renderers[type](el, data);
+      renderers[type](li, data);
     }
     return li;
   };
@@ -264,15 +264,21 @@
       thumb = item.find('[name*="thumb_id"]').val();
       selectFile((function(_this) {
         return function(selection) {
-          var selectedImage;
+          var img, model, selectedImage;
           selectedImage = selection[0];
           if (typeof console !== "undefined" && console !== null) {
             console.log(selectedImage, _this);
           }
           thumb = selectedImage.sizes.thumbnail ? selectedImage.sizes.thumbnail : selectedImage.sizes.full;
-          item.find('img').attr('src', thumb.url);
+          img = item.find('img').attr('src', thumb.url);
+          img.replaceWith(img.clone());
           item.find('[name*="thumb_id"]').val(selectedImage.id);
-          return item.addClass('has-thumb');
+          item.addClass('has-thumb');
+          model = item.data('linksetItem');
+          model.thumb_id = selectedImage.id;
+          model.thumb_url = thumb.url;
+          item.removeClass('has-thumb-restore');
+          return item.removeData('thumb_restore');
         };
       })(this), {
         type: 'image',
@@ -281,11 +287,31 @@
       });
       return false;
     }).on('click', '[data-action="thumb-delete"]', function() {
-      var item;
+      var data, item;
       item = $(this).closest('.linkset-item');
+      data = item.data('linksetItem');
+      if (data.thumb_id) {
+        item.data('thumb_restore', {
+          thumb_id: data.thumb_id,
+          thumb_url: data.thumb_url
+        });
+        item.addClass('has-thumb-restore');
+      }
       item.find('img').attr('src', '');
       item.find('[name*="thumb_id"]').val('');
       item.removeClass('has-thumb');
+      return false;
+    }).on('click', '[data-action="thumb-restore"]', function() {
+      var data, item;
+      item = $(this).closest('.linkset-item');
+      data = item.data('thumb_restore');
+      if (data.thumb_id) {
+        item.find('img').attr('src', data.thumb_url);
+        item.find('[name*="thumb_id"]').val(data.thumb_id);
+        item.addClass('has-thumb');
+      }
+      item.removeClass('has-thumb-restore');
+      item.removeData('thumb_restore');
       return false;
     });
     $('#wpPostAttachments-list').sortable();

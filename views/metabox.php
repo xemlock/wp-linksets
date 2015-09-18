@@ -82,8 +82,7 @@
 
 <script type="text/html" id="tmpl-wpPostAttachments-item">
     <# var has_thumb = data.thumb_id ? 'has-thumb' : '' #>
-
-    <div class="linkset-item linkset-item-type-{{ data.type }} {{ has_thumb }}">
+    <li class="wppa-link linkset-item linkset-item-type-{{ data.type }} {{ has_thumb }}">
         <div class="linkset-item-thumb">
             <div class="">
                 <input type="hidden" name="thumb_id" value="{{ data.thumb_id }}" />
@@ -100,6 +99,9 @@
                     </a>
                     <a class="linkset-item-thumb-action linkset-item-thumb-action-delete" href="#" data-action="thumb-delete">
                         <i class="dashicons dashicons-no"></i> <?php echo __('Delete') ?>
+                    </a>
+                    <a class="linkset-item-thumb-action linkset-item-thumb-action-restore" href="#" data-action="thumb-restore">
+                        <i class="dashicons dashicons-undo"></i> <?php echo __('Restore') ?>
                     </a>
                 </div>
             </div>
@@ -119,5 +121,5 @@
         <button class="linkset-item-delete" type="button" data-action="attachment-delete" title="<?php echo __('Remove') ?>">
             <i class="dashicons dashicons-no"></i>
         </button>
-    </div>
+    </li>
 </script>

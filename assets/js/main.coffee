@@ -102,15 +102,17 @@ renderAttachment = (data) ->
 
     list = $ '#wpPostAttachments-list'
 
-    li = $ '<li class="wppa-link" />'
+    li = renderRenamed 'item', data
     li.appendTo list
-    li.append (el = renderRenamed 'item', data)
-    li.find('.linkset-item').data 'linksetItem', data
+
+    # create model independent of provided data
+    model = $.extend true, {}, data
+    li.data 'linksetItem', model
 
     list.removeClass NO_ITEMS
 
     if typeof renderers[type] == 'function'
-        renderers[type] el, data
+        renderers[type] li, data
 
     return li
 
@@ -263,9 +265,23 @@ $ ->
                 # selectedImage.url
                 thumb = if selectedImage.sizes.thumbnail then selectedImage.sizes.thumbnail else selectedImage.sizes.full
 
-                item.find('img').attr('src', thumb.url)
+                img = item.find('img').attr('src', thumb.url)
+
+                # trigger reflow
+                img.replaceWith img.clone()
+
                 item.find('[name*="thumb_id"]').val(selectedImage.id)
                 item.addClass('has-thumb')
+
+                # update model accordingly
+                model = item.data 'linksetItem'
+                model.thumb_id = selectedImage.id
+                model.thumb_url = thumb.url
+
+                # successful thumbnail selection removes restore data
+                item.removeClass('has-thumb-restore')
+                item.removeData 'thumb_restore'
+
             ,
                 type: 'image'
                 multiple: false
@@ -275,11 +291,32 @@ $ ->
 
         .on 'click', '[data-action="thumb-delete"]', ->
             item = $(this).closest('.linkset-item')
+
+            data = item.data 'linksetItem'
+            if data.thumb_id
+                item.data 'thumb_restore',
+                    thumb_id: data.thumb_id
+                    thumb_url: data.thumb_url
+                item.addClass 'has-thumb-restore'
+
             item.find('img').attr('src', '')
             item.find('[name*="thumb_id"]').val('')
             item.removeClass('has-thumb')
+
             return false
 
+        .on 'click', '[data-action="thumb-restore"]', ->
+            item = $(this).closest('.linkset-item')
+            data = item.data 'thumb_restore'
+            if data.thumb_id
+                item.find('img').attr 'src', data.thumb_url
+                item.find('[name*="thumb_id"]').val data.thumb_id
+                item.addClass 'has-thumb'
+
+            item.removeClass 'has-thumb-restore'
+            item.removeData 'thumb_restore'
+
+            return false
 
 
     $('#wpPostAttachments-list').sortable()
