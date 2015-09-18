@@ -63,12 +63,23 @@ selectPost = (onSelect, options) ->
                 onSelect selected if typeof onSelect == 'function'
                 return
 
+    # findPosts.open() does not setup event handlers, so we have to do it manually
+    # (handlers are done in $.ready which will not work well with templated dialog
+
     dialog.find('#find-posts-close')
         .unbind 'click'
         .bind 'click', (e) ->
             e.preventDefault()
             findPosts.close()
             return
+
+    $('#find-posts-search').click findPosts.send
+    $( '#find-posts .find-box-search :input' ).keypress (e) ->
+        if e.which == 13
+            findPosts.send()
+            return false
+
+    $('#find-posts-close').click findPosts.close
 
     findPosts.open()
 
@@ -79,12 +90,33 @@ renderers =
     youtube: (el, data) ->
         model = el.find('[name*="video_id"]:input')
 
+        getThumbId = ->
+            thumbId = 0 + $.trim el.find('[name*="thumb_id"]:input').val()
+            console?.log thumbId
+            return if thumbId > 0 then thumbId else 0
+
+        # load video thumbnail if no thumb_id is present
         loadDefaultThumb = ->
             src = "http://img.youtube.com/vi/#{ model.val() }/default.jpg"
-            thumb_id = el.find('[name*="thumb_id"]:input').val()
-            console?.log thumb_id
-            if $.trim(thumb_id) == ''
-                el.find('img').attr('src', src)
+
+            if not getThumbId()
+                i = new Image;
+                i.onload = ->
+                    orientation = if i.width >= i.height then 'landscape' else 'portrait'
+
+                    # show thumbnail only if thumbnail has not been set
+                    if not getThumbId()
+                        img = el.find('img')
+
+                        cl = img.clone()
+                        cl.attr('src', src)
+                        img.replaceWith cl
+
+                        cl.closest('.linkset-item-thumb').addClass orientation
+
+                    console.log i.src, i.width, i.height, orientation
+                i.src = src
+
             return
 
         model.change loadDefaultThumb
@@ -266,6 +298,8 @@ $ ->
                 thumb = if selectedImage.sizes.thumbnail then selectedImage.sizes.thumbnail else selectedImage.sizes.full
 
                 img = item.find('img').attr('src', thumb.url)
+                img.closest('.linkset-item-thumb').removeClass('landscape portrait')
+                img.closest('.linkset-item-thumb').addClass selectedImage.orientation
 
                 # trigger reflow
                 img.replaceWith img.clone()

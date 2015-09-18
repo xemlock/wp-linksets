@@ -86,7 +86,7 @@
     <# var has_thumb = data.thumb_id ? 'has-thumb' : '' #>
     <li class="wppa-link linkset-item linkset-item-type-{{ data.type }} {{ has_thumb }}">
         <div class="linkset-item-thumb">
-            <div class="">
+            <div class="thumb-inner">
                 <input type="hidden" name="thumb_id" value="{{ data.thumb_id }}" />
                 <# if (data.thumb_url) { #>
                     <img src="{{ data.thumb_url }}" alt="" />

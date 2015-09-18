@@ -79,22 +79,51 @@
       e.preventDefault();
       findPosts.close();
     });
+    $('#find-posts-search').click(findPosts.send);
+    $('#find-posts .find-box-search :input').keypress(function(e) {
+      if (e.which === 13) {
+        findPosts.send();
+        return false;
+      }
+    });
+    $('#find-posts-close').click(findPosts.close);
     return findPosts.open();
   };
 
   renderers = {
     youtube: function(el, data) {
-      var loadDefaultThumb, model;
+      var getThumbId, loadDefaultThumb, model;
       model = el.find('[name*="video_id"]:input');
-      loadDefaultThumb = function() {
-        var src, thumb_id;
-        src = "http://img.youtube.com/vi/" + (model.val()) + "/default.jpg";
-        thumb_id = el.find('[name*="thumb_id"]:input').val();
+      getThumbId = function() {
+        var thumbId;
+        thumbId = 0 + $.trim(el.find('[name*="thumb_id"]:input').val());
         if (typeof console !== "undefined" && console !== null) {
-          console.log(thumb_id);
+          console.log(thumbId);
         }
-        if ($.trim(thumb_id) === '') {
-          el.find('img').attr('src', src);
+        if (thumbId > 0) {
+          return thumbId;
+        } else {
+          return 0;
+        }
+      };
+      loadDefaultThumb = function() {
+        var i, src;
+        src = "http://img.youtube.com/vi/" + (model.val()) + "/default.jpg";
+        if (!getThumbId()) {
+          i = new Image;
+          i.onload = function() {
+            var cl, img, orientation;
+            orientation = i.width >= i.height ? 'landscape' : 'portrait';
+            if (!getThumbId()) {
+              img = el.find('img');
+              cl = img.clone();
+              cl.attr('src', src);
+              img.replaceWith(cl);
+              cl.closest('.linkset-item-thumb').addClass(orientation);
+            }
+            return console.log(i.src, i.width, i.height, orientation);
+          };
+          i.src = src;
         }
       };
       model.change(loadDefaultThumb);
@@ -271,6 +300,8 @@
           }
           thumb = selectedImage.sizes.thumbnail ? selectedImage.sizes.thumbnail : selectedImage.sizes.full;
           img = item.find('img').attr('src', thumb.url);
+          img.closest('.linkset-item-thumb').removeClass('landscape portrait');
+          img.closest('.linkset-item-thumb').addClass(selectedImage.orientation);
           img.replaceWith(img.clone());
           item.find('[name*="thumb_id"]').val(selectedImage.id);
           item.addClass('has-thumb');

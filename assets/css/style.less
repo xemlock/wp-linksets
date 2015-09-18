@@ -96,9 +96,27 @@
 }
 
 .linkset-item-thumb img {
+    display: block;
+    transform: translate(-50%, -50%);
+}
+
+.linkset-item-thumb.landscape img {
     height: 100%;
+}
+
+.linkset-item-thumb.portrait img {
     width: 100%;
 }
+
+.thumb-inner {
+    display: block;
+    width: 100%;
+    height: 100%;
+    transform: translate(50%, 50%);
+}
+
+
+
 .linkset-item-data {
     padding-left: 160px;
 
