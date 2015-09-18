@@ -108,7 +108,7 @@
       };
       loadDefaultThumb = function() {
         var i, src;
-        src = "http://img.youtube.com/vi/" + (model.val()) + "/default.jpg";
+        src = "http://img.youtube.com/vi/" + (model.val()) + "/hqdefault.jpg";
         if (!getThumbId()) {
           i = new Image;
           i.onload = function() {

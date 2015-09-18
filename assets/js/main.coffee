@@ -97,7 +97,7 @@ renderers =
 
         # load video thumbnail if no thumb_id is present
         loadDefaultThumb = ->
-            src = "http://img.youtube.com/vi/#{ model.val() }/default.jpg"
+            src = "http://img.youtube.com/vi/#{ model.val() }/hqdefault.jpg"
 
             if not getThumbId()
                 i = new Image;
