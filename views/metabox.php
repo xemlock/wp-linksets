@@ -71,20 +71,20 @@
 </script>
 
 <script type="text/html" id="tmpl-wpPostAttachments-undo">
-    <div class="linkset-item">
-        Link removed
-        <button type="button" data-action="delete-undo" title="Undo link removal"><i class="fa fa-undo"></i> Undo</button>
-
+    <li class="linkset-item not-draggable linkset-item-deleted">
+        <p>
+            <?php echo __('Link has been removed.') ?>
+            <a href="#" data-action="delete-undo" title="Undo link removal"><?php echo __('Undo') ?></a>
+        </p>
         <button class="linkset-item-delete" type="button" data-action="delete-confirm" title="<?php echo __('Dismiss') ?>">
             <i class="dashicons dashicons-no"></i>
         </button>
-
-    </div>
+    </li>
 </script>
 
 <script type="text/html" id="tmpl-wpPostAttachments-item">
     <# var has_thumb = data.thumb_id ? 'has-thumb' : '' #>
-    <li class="wppa-link linkset-item linkset-item-type-{{ data.type }} {{ has_thumb }}">
+    <li class="linkset-item linkset-item-type-{{ data.type }} {{ has_thumb }}">
         <div class="linkset-item-thumb">
             <div class="thumb-inner">
                 <input type="hidden" name="thumb_id" value="{{ data.thumb_id }}" />

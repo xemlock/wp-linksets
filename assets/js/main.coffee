@@ -1,9 +1,22 @@
 $ = jQuery
-REQUEST_KEY = 'linkset'
-NO_ITEMS = 'no-items'
+
+REQUEST_KEY             = 'linkset'
+
+CLASS_NO_ITEMS          = 'no-items'
+CLASS_HAS_THUMB         = 'has-thumb'
+CLASS_HAS_THUMB_RESTORE = 'has-thumb-restore'
+
+DATA_NS                 = 'wpLinksets'
+DATA_DELETE_UNDO        = 'deleteUndo'
+DATA_THUMB_RESTORE      = 'thumbRestore'
+
+EVENT_THUMB_DELETE      = 'thumbdelete'
 
 wpLinksets =
     POST_THUMBNAIL_URL_STRUCT: ''
+
+dataKey = (key) ->
+    DATA_NS + '.' + key
 
 selectFile = (onSelect, options) ->
     if frame
@@ -22,7 +35,7 @@ selectFile = (onSelect, options) ->
             selection = frame.state().get('selection')
             file = wp.media.attachment options.selected;
             file.fetch()
-            console.log 'fetched: ', file
+            console?.log 'fetched: ', file
 
             if file
                 selection.add [file]
@@ -88,16 +101,16 @@ selectPost = (onSelect, options) ->
 # perform additional logic when rendering attachment
 renderers =
     youtube: (el, data) ->
-        model = el.find('[name*="video_id"]:input')
+        input = el.find('[name*="video_id"]:input')
 
         getThumbId = ->
-            thumbId = 0 + $.trim el.find('[name*="thumb_id"]:input').val()
+            thumbId = 0 + $.trim input.val()
             console?.log thumbId
             return if thumbId > 0 then thumbId else 0
 
         # load video thumbnail if no thumb_id is present
         loadDefaultThumb = ->
-            src = "http://img.youtube.com/vi/#{ model.val() }/hqdefault.jpg"
+            src = "http://img.youtube.com/vi/#{ input.val() }/hqdefault.jpg"
 
             if not getThumbId()
                 i = new Image;
@@ -114,15 +127,17 @@ renderers =
 
                         cl.closest('.linkset-item-thumb').addClass orientation
 
-                    console.log i.src, i.width, i.height, orientation
+                    console?.log i.src, i.width, i.height, orientation
                 i.src = src
 
             return
 
-        model.change loadDefaultThumb
+        input.change loadDefaultThumb
         loadDefaultThumb()
 
-        # TODO show default YT thumb when thumbnail is removed
+        # show default YT thumb when thumbnail is removed
+        el.on EVENT_THUMB_DELETE, loadDefaultThumb
+
         return
 
 # Render link using given data
@@ -141,7 +156,7 @@ renderAttachment = (data) ->
     model = $.extend true, {}, data
     li.data 'linksetItem', model
 
-    list.closest('.linkset-container').removeClass NO_ITEMS
+    list.closest('.linkset-container').removeClass CLASS_NO_ITEMS
 
     if typeof renderers[type] == 'function'
         renderers[type] li, data
@@ -248,23 +263,43 @@ $ ->
 
         .on 'click', '[data-action="attachment-delete"]', ->
             li = $(this).closest('li')
-            li2 = $ '<li class="wppa-link" />'
 
             tpl = wp.template "wpPostAttachments-undo"
-            li2.append tpl()
+            li2 = $ tpl()
 
-            li2.outerWidth li.outerWidth()
+            # place replacement element after element to be removed
+            # - need this to properly determine target height
+            li.after(li2)
+            h = li2.height()
+
+            li2.data dataKey(DATA_DELETE_UNDO),
+                el: li
+                animate:
+                    height: li.height()
+                    opacity: 1
+
             li2.outerHeight li.outerHeight()
-            li.replaceWith li2
 
-            li2.data 'origLI', li
+            li.replaceWith li2
+            # set removed item height as terget height for h, so that it will
+            # be initial height when undoing the removal
+            li.height h
+
+            li2.animate
+                height: h
 
             return false
 
         .on 'click', '[data-action="delete-undo"]', ->
             li = $(this).closest('li')
-            li.replaceWith li.data('origLI')
+            li.stop()
+
+            undoData = li.data dataKey DATA_DELETE_UNDO
+            li.replaceWith undoData.el
             li.remove()
+
+            undoData.el.animate undoData.animate
+
             return false
 
         .on 'click', '[data-action="delete-confirm"]', ->
@@ -280,8 +315,8 @@ $ ->
                 $(this).remove()
 
                 list = $ '#wpPostAttachments-list'
-                if list.children(':not(.linkset-item-empty)').size() == 0
-                    list.closest('.linkset-container').addClass NO_ITEMS
+                if list.children().size() == 0
+                    list.closest('.linkset-container').addClass CLASS_NO_ITEMS
 
 
             return false
@@ -305,7 +340,7 @@ $ ->
                 img.replaceWith img.clone()
 
                 item.find('[name*="thumb_id"]').val(selectedImage.id)
-                item.addClass('has-thumb')
+                item.addClass CLASS_HAS_THUMB
 
                 # update model accordingly
                 model = item.data 'linksetItem'
@@ -314,7 +349,7 @@ $ ->
 
                 # successful thumbnail selection removes restore data
                 item.removeClass('has-thumb-restore')
-                item.removeData 'thumb_restore'
+                item.removeData dataKey(DATA_THUMB_RESTORE)
 
             ,
                 type: 'image'
@@ -328,33 +363,35 @@ $ ->
 
             data = item.data 'linksetItem'
             if data.thumb_id
-                item.data 'thumb_restore',
+                item.data dataKey(DATA_THUMB_RESTORE),
                     thumb_id: data.thumb_id
                     thumb_url: data.thumb_url
-                item.addClass 'has-thumb-restore'
+                item.addClass CLASS_HAS_THUMB_RESTORE
 
             item.find('img').attr('src', '')
             item.find('[name*="thumb_id"]').val('')
-            item.removeClass('has-thumb')
+            item.removeClass CLASS_HAS_THUMB
+
+            item.trigger EVENT_THUMB_DELETE
 
             return false
 
         .on 'click', '[data-action="thumb-restore"]', ->
             item = $(this).closest('.linkset-item')
-            data = item.data 'thumb_restore'
+            data = item.data dataKey(DATA_THUMB_RESTORE)
             if data.thumb_id
                 item.find('img').attr 'src', data.thumb_url
                 item.find('[name*="thumb_id"]').val data.thumb_id
-                item.addClass 'has-thumb'
+                item.addClass CLASS_HAS_THUMB
 
-            item.removeClass 'has-thumb-restore'
-            item.removeData 'thumb_restore'
+            item.removeClass CLASS_HAS_THUMB_RESTORE
+            item.removeData dataKey(DATA_THUMB_RESTORE)
 
             return false
 
 
     $('#wpPostAttachments-list').sortable
-        items: '.linkset-item:not(.linkset-item-empty)'
+        items: '.linkset-item:not(.not-draggable)'
 
     return
 
