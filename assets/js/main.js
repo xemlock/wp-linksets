@@ -325,13 +325,10 @@
     }
     _.each(wpLinksets.linkset, renderAttachment);
     $('#post-attachments-metabox').on('click', '[data-action="attach-link"]', function() {
-      renderAttachment('link');
+      renderAttachment('url');
       return false;
     }).on('click', '[data-action="attach-file"]', function() {
       attachFile();
-      return false;
-    }).on('click', '[data-action="attach-audio"]', function() {
-      attachFile('audio');
       return false;
     }).on('click', '[data-action="attach-youtube"]', function() {
       renderAttachment('youtube');

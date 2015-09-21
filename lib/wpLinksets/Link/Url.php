@@ -2,9 +2,9 @@
 
 namespace wpLinksets\Link;
 
-class Link extends BaseLink
+class Url extends BaseLink
 {
-    const TYPE = 'link';
+    const TYPE = 'url';
 
     protected $_url;
 
@@ -15,6 +15,10 @@ class Link extends BaseLink
 
     public function set_url($url)
     {
+        $url = trim($url);
+        if (strlen($url) && !preg_match('#(https?|ftp)://#', $url)) {
+            $url = 'http://' . $url;
+        }
         $this->_url = $url;
     }
 
@@ -32,11 +36,11 @@ class Link extends BaseLink
 
     /**
      * @param array $data
-     * @return Link
+     * @return Url
      */
     public static function from_array(array $data)
     {
-        /** @var Link $link */
+        /** @var Url $link */
         $link = new static();
         $link->set_from_array($data);
         return $link;

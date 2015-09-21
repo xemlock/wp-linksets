@@ -50,7 +50,7 @@
     </div>
 </script>
 
-<script type="text/html" id="tmpl-wpPostAttachments-item-link">
+<script type="text/html" id="tmpl-wpPostAttachments-item-url">
     <div class="linkset-item-type">
         <i class="dashicons dashicons-admin-site"></i>
         <?php echo __('Website') ?>

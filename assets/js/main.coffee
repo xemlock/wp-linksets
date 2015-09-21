@@ -308,15 +308,11 @@ $ ->
 
     $('#post-attachments-metabox')
         .on 'click', '[data-action="attach-link"]', ->
-            renderAttachment 'link'
+            renderAttachment 'url'
             return false
 
         .on 'click', '[data-action="attach-file"]', ->
             attachFile()
-            return false
-
-        .on 'click', '[data-action="attach-audio"]', ->
-            attachFile 'audio'
             return false
 
         .on 'click', '[data-action="attach-youtube"]', ->

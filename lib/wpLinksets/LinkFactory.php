@@ -9,10 +9,9 @@ class LinkFactory
      * @var array
      */
     protected $_type_classes = array(
-        'link'    => '\\wpLinksets\\Link\\Link',
+        'url'     => '\\wpLinksets\\Link\\Url',
         'post'    => '\\wpLinksets\\Link\\Post',
         'file'    => '\\wpLinksets\\Link\\File',
-        'audio'   => '\\wpLinksets\\Link\\Audio',
         'youtube' => '\\wpLinksets\\Link\\Youtube',
     );
 
