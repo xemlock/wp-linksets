@@ -17,6 +17,7 @@
             "wpLinksets\\": "lib/"
         },
         "files": [
+            "lib/functions.php",
             "bootstrap.php"
         ]
     }

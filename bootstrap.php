@@ -5,9 +5,9 @@
  * Plugin URI:  http://github.com/xemlock/wp-linksets
  * Description:
  * Author:      xemlock <xemlock@gmail.com>
- * Author URI:  http://xemlock.pl
+ * Author URI:  http://xemlock.github.io
  * Version:     0.1.0
- * License:     GPLv2 or later
+ * License:     MIT
  */
 
 defined('ABSPATH') || die();
