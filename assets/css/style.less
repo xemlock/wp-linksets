@@ -1,3 +1,29 @@
+.linksets-metabox {
+
+    .clearfix:before,
+    .clearfix:after {
+        content: ' ';
+        display: table;
+    }
+    .clearfix:after {
+        clear: both;
+    }
+
+    // fix dashicon sizing
+    .dashicons,
+    .dashicons-before:before {
+        font-size: 1.25em; // dashicons are not very much to scale...
+        line-heigth: normal;
+        width: auto;
+        height: auto;
+        vertical-align: middle;
+        margin: 0;
+        margin-top: -.25em;
+        padding: 0;
+    }
+}
+
+
 #wpPostAttachments-buttons {
     background: #eee;
     padding: 10px;
@@ -5,10 +31,40 @@
 
 .linksets-initial {
     padding: 8px 12px;
+}
 
-    .js & no
-    .no-js {
+.linkset-menubar {
+    background: #f7f7f7;
+    border-top: 1px solid #ccc;
+}
 
+.linkset-menubar-btn {
+    text-align: center;
+    border: none;
+    background: none;
+    padding: 10px;
+    margin: 0;
+    width: 100px;
+    float: left;
+    display: block;
+    font-size: 11px;
+    height: 80px;
+    cursor: pointer;
+
+    & + & {
+        border-left: 1px solid #ccc;
+    }
+
+    &:hover {
+        background: red;
+    }
+
+    .dashicons {
+        display: block;
+        font-size: 24px;
+        text-align: center;
+        margin-bottom: 6px;
+        width: auto;
     }
 }
 
@@ -66,22 +122,6 @@
     &.ui-sortable-placeholder {
         visibility: visible !important;
         background: #f6f6f6;
-    }
-}
-
-
-/* fix dashicon sizing */
-.linkset-item {
-    .dashicons,
-    .dashicons-before:before {
-        font-size: 1.25em; // dashicons are not very much to scale...
-        line-heigth: normal;
-        width: auto;
-        height: auto;
-        vertical-align: middle;
-        margin: 0;
-        margin-top: -.25em;
-        padding: 0;
     }
 }
 

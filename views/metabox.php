@@ -1,12 +1,13 @@
 <?php defined('ABSPATH') || die(); ?>
 <?php /** @var \wpLinksets\Plugin $this */ ?>
 
-<input type="hidden" name="custom_meta_box_nonce" value="<?php echo $this->get_nonce() ?>" />
-
-<div id="post-attachments-metabox">
-    <p class="linksets-initial">
-        <?php echo __('Starting widget, please wait...') ?>
-    </p>
+<div class="linksets-metabox">
+    <input type="hidden" name="custom_meta_box_nonce" value="<?php echo $this->get_nonce() ?>" />
+    <div id="post-attachments-metabox">
+        <p class="linksets-initial">
+            <?php echo __('Starting widget, please wait...') ?>
+        </p>
+    </div>
 </div>
 
 <script>
@@ -28,18 +29,31 @@
             <?php echo __('No links. Add links using the buttons below') ?>
         </p>
     </div>
-    <div id="wpPostAttachments-buttons">
-        <button type="button" data-action="attach-link"><i class="fa fa-lg fa-link"></i> Link</button>
-        <button type="button" data-action="attach-post"><i class="fa fa-lg fa-file"></i> Post</button>
-        <button type="button" data-action="attach-file"><i class="fa fa-lg fa-file-text"></i> File</button>
-        <button type="button" data-action="attach-youtube"><i class="fa fa-lg fa-youtube-play"></i> Youtube</button>
+    <div class="linkset-menubar clearfix">
+        <p class="" style="float:left">Add link</p>
+        <button type="button" class="linkset-menubar-btn" data-action="attach-link">
+            <i class="dashicons dashicons-admin-site"></i>
+            <?php echo __('Website') ?>
+        </button>
+        <button type="button" class="linkset-menubar-btn" data-action="attach-post">
+            <i class="dashicons dashicons-admin-post"></i>
+            <?php echo __('Post') ?>
+        </button>
+        <button type="button" class="linkset-menubar-btn" data-action="attach-file">
+            <i class="dashicons dashicons-media-default"></i>
+            <?php echo __('File') ?>
+        </button>
+        <button type="button" class="linkset-menubar-btn" data-action="attach-youtube">
+            <i class="dashicons dashicons-video-alt3"></i>
+            <?php echo __('YouTube Video') ?>
+        </button>
     </div>
 </script>
 
 <script type="text/html" id="tmpl-wpPostAttachments-item-link">
     <div class="linkset-item-type">
         <i class="dashicons dashicons-admin-site"></i>
-        <?php echo __('Website link') ?>
+        <?php echo __('Website') ?>
     </div>
 
     <input type="text" name="url" value="{{ data.url }}" placeholder="http://" />
