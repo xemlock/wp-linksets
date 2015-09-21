@@ -99,12 +99,53 @@ selectPost = (onSelect, options) ->
 
 
 # perform additional logic when rendering attachment
+loadDefaultThumbnail = (el, url) ->
+
+
+
+postHandler = (el, data) ->
+    getThumbId = ->
+        thumbId = 0 + $.trim el.find('[name*="thumb_id"]').val()
+        console?.log thumbId
+        return if thumbId > 0 then thumbId else 0
+
+    el.on EVENT_THUMB_DELETE, ->
+        input = el.find('[name*="id"]:input')
+        img = el.find('img')
+
+        src = wpLinksets.POST_THUMBNAIL_URL_STRUCT
+            .replace /%post_id%/g, data.id
+            .replace /%size%/g, 'thumbnail'
+
+        i = new Image
+        i.onload = ->
+            orientation = if i.width >= i.height then 'landscape' else 'portrait'
+            console?.log orientation, i.src, i.width, i.height
+
+            # show thumbnail only if thumbnail has not been set
+            if not getThumbId()
+                img = el.find('img')
+
+                cl = img.clone()
+                cl.attr('src', src)
+                img.replaceWith cl
+
+                cl.closest('.linkset-item-thumb').addClass orientation
+
+            return
+
+        i.src = src
+
+        return
+
 renderers =
+    post: postHandler
+    file: postHandler
     youtube: (el, data) ->
         input = el.find('[name*="video_id"]:input')
 
         getThumbId = ->
-            thumbId = 0 + $.trim input.val()
+            thumbId = 0 + $.trim el.find('[name*="thumb_id"]').val()
             console?.log thumbId
             return if thumbId > 0 then thumbId else 0
 
