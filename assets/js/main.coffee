@@ -15,6 +15,8 @@ EVENT_THUMB_DELETE      = 'thumbdelete'
 wpLinksets =
     POST_URL_STRUCT:           ''
     POST_THUMBNAIL_URL_STRUCT: ''
+    messages:
+        selectFile: 'Select file'
 
 dataKey = (key) ->
     DATA_NS + '.' + key
@@ -26,7 +28,7 @@ selectFile = (onSelect, options) ->
 
     # Sets up the media library frame
     frame = wp.media
-         title: options.title or 'Select file'
+         title: options.title or wpLinksets.messages.selectFile
          button: {text: 'Select'}
          library: {type: options.type}
          multiple : options.multiple

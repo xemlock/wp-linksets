@@ -22,7 +22,10 @@
 
   wpLinksets = {
     POST_URL_STRUCT: '',
-    POST_THUMBNAIL_URL_STRUCT: ''
+    POST_THUMBNAIL_URL_STRUCT: '',
+    messages: {
+      selectFile: 'Select file'
+    }
   };
 
   dataKey = function(key) {
@@ -36,7 +39,7 @@
       return;
     }
     frame = wp.media({
-      title: options.title || 'Select file',
+      title: options.title || wpLinksets.messages.selectFile,
       button: {
         text: 'Select'
       },

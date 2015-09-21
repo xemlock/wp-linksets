@@ -12,6 +12,7 @@
 <script>
     wpLinksets.POST_URL_STRUCT = <?php echo wp_json_encode(get_site_url() . '/?p=%post_id%') ?>;
     wpLinksets.POST_THUMBNAIL_URL_STRUCT = <?php echo wp_json_encode(get_site_url() . get_unified_post_thumbnail_url_structure()) ?>;
+    wpLinksets.messages.selectFile = <?php echo wp_json_encode(__('Select file')) ?>;
     wpLinksets.linkset = <?php echo wp_json_encode($this->get_linkset($post)->get_js_data()) ?>;
 </script>
 
