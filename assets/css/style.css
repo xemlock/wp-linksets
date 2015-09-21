@@ -78,7 +78,7 @@
   width: 150px;
   height: 150px;
   float: left;
-  background: #eeeeee url('http://placehold.it/150x150') no-repeat 50% 50%;
+  background: #eeeeee url(../img/thumb.png) no-repeat 50% 50%;
   border: 1px solid rgba(0, 0, 0, 0.1);
   position: relative;
   overflow: hidden;
