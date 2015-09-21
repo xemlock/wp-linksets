@@ -29,8 +29,8 @@
             <?php echo __('No links. Add links using the buttons below') ?>
         </p>
     </div>
-    <div class="linkset-menubar clearfix">
-        <p class="" style="float:left">Add link</p>
+    <div class="linkset-menubar">
+        <p class="linkset-menubar-label">Add link</p>
         <button type="button" class="linkset-menubar-btn" data-action="attach-link">
             <i class="dashicons dashicons-admin-site"></i>
             <?php echo __('Website') ?>

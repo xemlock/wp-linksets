@@ -1,11 +1,3 @@
-.linksets-metabox .clearfix:before,
-.linksets-metabox .clearfix:after {
-  content: ' ';
-  display: table;
-}
-.linksets-metabox .clearfix:after {
-  clear: both;
-}
 .linksets-metabox .dashicons,
 .linksets-metabox .dashicons-before:before {
   font-size: 1.25em;
@@ -26,7 +18,23 @@
 }
 .linkset-menubar {
   background: #f7f7f7;
-  border-top: 1px solid #ccc;
+  border-top: 1px solid #dedede;
+}
+.linkset-menubar:before,
+.linkset-menubar:after {
+  content: ' ';
+  display: table;
+}
+.linkset-menubar:after {
+  clear: both;
+}
+.linkset-menubar-label {
+  width: 170px;
+  float: left;
+  padding: 10px;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
 }
 .linkset-menubar-btn {
   text-align: center;
@@ -40,6 +48,7 @@
   font-size: 11px;
   height: 80px;
   cursor: pointer;
+  color: #555;
 }
 .linkset-menubar-btn + .linkset-menubar-btn {
   border-left: 1px solid #ccc;
