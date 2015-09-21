@@ -198,18 +198,33 @@ abstract class BaseLink
     }
 
     /**
+     * Get data to be used when serializing this object in the database
+     *
      * @return array
      */
     public function to_array()
     {
         return array(
             'type'        => $this->get_type(),
+            'url'         => $this->get_url(),
             'title'       => $this->get_title(),
             'description' => $this->get_description(),
             'date'        => $this->get_date(),
             'author_id'   => $this->get_author_id(),
             'thumb_id'    => $this->get_thumb_id(),
         );
+    }
+
+    /**
+     * Returns an array of data for this object to be used in the JavaScript
+     *
+     * @return array
+     */
+    public function get_js_data()
+    {
+        $data = $this->to_array();
+        $data['thumb_url'] = $this->get_thumb_url('thumbnail');
+        return $data;
     }
 
     /**

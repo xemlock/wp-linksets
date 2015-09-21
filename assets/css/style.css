@@ -63,7 +63,7 @@
   height: auto;
   vertical-align: middle;
   margin: 0;
-  margin-top: -0.05em;
+  margin-top: -0.25em;
   padding: 0;
 }
 .linkset-item:before,
@@ -98,6 +98,11 @@
   width: 100%;
   height: 100%;
   transform: translate(50%, 50%);
+}
+.linkset-item-type {
+  margin: 0 0 4px;
+  color: #888;
+  font-style: italic;
 }
 .linkset-item-data {
   padding-left: 160px;
@@ -208,4 +213,10 @@
 .linkset-item.has-thumb .linkset-item-thumb-action-delete,
 .linkset-item.has-thumb-restore .linkset-item-thumb-action-restore {
   display: block;
+}
+.linkset-item-file-info {
+  margin-bottom: 10px;
+}
+.linkset-item-post-info {
+  margin-bottom: 10px;
 }

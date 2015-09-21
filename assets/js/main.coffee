@@ -163,6 +163,21 @@ renderAttachment = (data) ->
 
     return li
 
+formatDate = (date) ->
+    _f = (x) ->
+        if x < 10 then '0' + String(x) else String(x)
+
+    day = _f date.getDate()
+    month = _f (date.getMonth() + 1)
+    year = date.getFullYear()
+
+    hour = _f date.getHours()
+    min = _f date.getMinutes()
+    sec = _f date.getSeconds()
+
+    return "#{ year }-#{ month }-#{ day} #{ hour }:#{ min }:#{ sec }"
+
+
 # type is optional
 attachFile = (type) ->
     selectFile (selected) ->
@@ -176,6 +191,7 @@ attachFile = (type) ->
                description: file.description
                thumb_url: if file.sizes then file.sizes.thumbnail.url else file.thumb_src
                file: file
+               date: formatDate file.date
     , {type: type, multiple: yes}
 
 attachPost = ->

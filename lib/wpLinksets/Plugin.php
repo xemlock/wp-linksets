@@ -216,7 +216,7 @@ class Plugin
      * Prior to building linkset data is filtered by get_linkset filter.
      *
      * @param int|\WP_Post $post_id OPTIONAL
-     * @return \wpLinksets\Linkset[]
+     * @return \wpLinksets\Linkset
      */
     public function get_linkset($post_id = null)
     {

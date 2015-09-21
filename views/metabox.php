@@ -7,15 +7,9 @@
     <?php echo __('Javascript is required for post attachments functionality'); ?>
 </div>
 
-<?php
-    $linkset = array();
-    foreach ($this->get_linkset($post) as $link) {
-        $linkset[] = array_merge($link->to_array(), array('thumb_url' => $link->get_thumb_url('thumbnail')));
-    }
-?>
 <script>
-    window.wpLinksets.POST_THUMBNAIL_URL_STRUCT = <?php echo wp_json_encode(get_site_url() . get_unified_post_thumbnail_url_structure()) ?>;
-    window.wpLinksets.linkset = <?php echo wp_json_encode($linkset) ?>;
+    wpLinksets.POST_THUMBNAIL_URL_STRUCT = <?php echo wp_json_encode(get_site_url() . get_unified_post_thumbnail_url_structure()) ?>;
+    wpLinksets.linkset = <?php echo wp_json_encode($this->get_linkset($post)->get_js_data()) ?>;
 </script>
 
 <script type="text/html" id="tmpl-wpPostAttachments-find-posts">
@@ -39,35 +33,49 @@
 </script>
 
 <script type="text/html" id="tmpl-wpPostAttachments-item-link">
-    <div>
-        <span><i class="fa fa-link"></i> Website link</span>
-        <input type="text" name="url" value="{{ data.url }}" placeholder="http://" />
+    <div class="linkset-item-type">
+        <i class="dashicons dashicons-admin-site"></i>
+        <?php echo __('Website link') ?>
     </div>
+
+    <input type="text" name="url" value="{{ data.url }}" placeholder="http://" />
 </script>
 
 <script type="text/html" id="tmpl-wpPostAttachments-item-post">
-    <div>
-        <span><i class="fa fa-file-text"></i> Post</span>
-        <input type="hidden" name="id" value="{{ data.id }}" />
+    <div class="linkset-item-type">
+        <i class="dashicons dashicons-admin-post"></i>
+        <?php echo __('Post') ?>
     </div>
+
+    <div class="linkset-item-post-info">
+        <a href="{{ data.url }}" target="_blank">{{ data.url }}</a>
+    </div>
+
+    <input type="hidden" name="id" value="{{ data.id }}" />
 </script>
 
 <script type="text/html" id="tmpl-wpPostAttachments-item-file">
-    <div>
-        <span><i class="fa fa-file-text"></i> File</span>
-        <input type="hidden" name="id" value="{{ data.id }}" />
-        <# if (data.file) { #>
-            {{ data.file.filename }}
-        <# } #>
+    <div class="linkset-item-type">
+        <i class="dashicons dashicons-media-default"></i>
+        <?php echo __('File') ?>
     </div>
+
+    <# if (data.file) { #>
+        <div class="linkset-item-file-info">
+            <a href="{{ data.file.url }}" target="_blank">{{ data.file.filename }}</a>
+        </div>
+    <# } #>
+
+    <input type="hidden" name="id" value="{{ data.id }}" />
 </script>
 
 <script type="text/html" id="tmpl-wpPostAttachments-item-youtube">
-    <div>
-        <span><i class="fa fa-youtube-play"></i> Youtube Video</span>
-        <input type="hidden" name="type" value="youtube" />
-        <input type="text" name="video_id" value="{{ data.video_id }}" placeholder="Video ID or URL at YouTube"/>
+    <div class="linkset-item-type">
+        <i class="dashicons dashicons-video-alt3"></i>
+        <?php echo __('YouTube Video') ?>
     </div>
+
+    <input type="text" name="video_id" value="{{ data.video_id }}" placeholder="Video ID or URL at YouTube"/>
 </script>
 
 <script type="text/html" id="tmpl-wpPostAttachments-undo">
@@ -109,16 +117,20 @@
             </div>
         </div>
         <div class="linkset-item-data">
-            {{{ data.renderString('item-' + data.type, data) }}}
             <input type="hidden" name="type" value="{{ data.type }}" />
-
-            <label><?php echo __('Title') ?></label>
-            <input type="text" name="title" value="{{ data.title }}" />
-
-            <label><?php echo __('Description') ?></label>
-            <textarea name="description">{{ data.description }}</textarea>
-
             <input type="hidden" name="date" value="{{ data.date }}" placeholder="YYYY-MM-DD HH:MM" />
+
+            {{{ data.renderString('item-' + data.type, data) }}}
+
+            <div>
+                <label><?php echo __('Title') ?></label>
+                <input type="text" name="title" value="{{ data.title }}" />
+            </div>
+
+            <div>
+                <label><?php echo __('Description') ?></label>
+                <textarea name="description">{{ data.description }}</textarea>
+            </div>
         </div>
         <button class="linkset-item-delete" type="button" data-action="attachment-delete" title="<?php echo __('Remove') ?>">
             <i class="dashicons dashicons-no"></i>

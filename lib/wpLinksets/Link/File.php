@@ -39,4 +39,14 @@ class File extends Post
         }
         return false;
     }
+
+    /**
+     * @return array
+     */
+    public function get_js_data()
+    {
+        $data = parent::get_js_data();
+        $data['file'] = wp_prepare_attachment_for_js($this->_post);
+        return $data;
+    }
 }

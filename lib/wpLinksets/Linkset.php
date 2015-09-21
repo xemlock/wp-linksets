@@ -32,6 +32,20 @@ class Linkset implements \Countable, \ArrayAccess, \IteratorAggregate
     }
 
     /**
+     * Get primitive representation for use in JavaScript
+     *
+     * @return array
+     */
+    public function get_js_data()
+    {
+        $data = array();
+        foreach ($this->_items as $item) {
+            $data[] = $item->get_js_data();
+        }
+        return $data;
+    }
+
+    /**
      * @return int
      */
     public function count()
