@@ -208,6 +208,7 @@
   display: block;
   font-size: 24px;
   line-height: 1;
+  margin: 0;
 }
 .linkset-item-thumb-action-delete,
 .linkset-item-thumb-action-restore {
