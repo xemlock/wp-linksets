@@ -4,10 +4,13 @@
 <input type="hidden" name="custom_meta_box_nonce" value="<?php echo $this->get_nonce() ?>" />
 
 <div id="post-attachments-metabox">
-    <?php echo __('Javascript is required for post attachments functionality'); ?>
+    <p class="linksets-initial">
+        <?php echo __('Starting widget, please wait...') ?>
+    </p>
 </div>
 
 <script>
+    wpLinksets.POST_URL_STRUCT = <?php echo wp_json_encode(get_site_url() . '/?p=%post_id%') ?>;
     wpLinksets.POST_THUMBNAIL_URL_STRUCT = <?php echo wp_json_encode(get_site_url() . get_unified_post_thumbnail_url_structure()) ?>;
     wpLinksets.linkset = <?php echo wp_json_encode($this->get_linkset($post)->get_js_data()) ?>;
 </script>
@@ -75,7 +78,7 @@
         <?php echo __('YouTube Video') ?>
     </div>
 
-    <input type="text" name="video_id" value="{{ data.video_id }}" placeholder="Video ID or URL at YouTube"/>
+    <input type="text" name="video_id" value="{{ data.video_id }}" placeholder="<?php echo __('Video ID or URL at YouTube') ?>"/>
 </script>
 
 <script type="text/html" id="tmpl-wpPostAttachments-undo">

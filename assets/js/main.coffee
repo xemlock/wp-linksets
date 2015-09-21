@@ -13,6 +13,7 @@ DATA_THUMB_RESTORE      = 'thumbRestore'
 EVENT_THUMB_DELETE      = 'thumbdelete'
 
 wpLinksets =
+    POST_URL_STRUCT:           ''
     POST_THUMBNAIL_URL_STRUCT: ''
 
 dataKey = (key) ->
@@ -66,8 +67,9 @@ selectPost = (onSelect, options) ->
             input = dialog.find('[name="found_post_id"]:checked')
             if input.size()
                 label = dialog.find('label[for="' + input.attr('id') + '"]')
+                post_id = parseInt(input.val(), 10)
                 selected =
-                    id: parseInt(input.val(), 10)
+                    id: post_id
                     title: label.text()
 
                 $(this).unbind 'click'
@@ -237,13 +239,18 @@ attachFile = (type) ->
 
 attachPost = ->
     selectPost (post) ->
+        postUrl = wpLinksets.POST_URL_STRUCT
+            .replace /%post_id%/g, post.id
+
         thumbUrl = wpLinksets.POST_THUMBNAIL_URL_STRUCT
             .replace /%post_id%/g, post.id
             .replace /%size%/g, 'thumbnail'
+
         renderAttachment
             type: 'post'
             id: post.id
             title: post.title
+            url: postUrl
             thumb_url: thumbUrl
 
 # render link

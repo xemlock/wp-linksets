@@ -21,6 +21,7 @@
   EVENT_THUMB_DELETE = 'thumbdelete';
 
   wpLinksets = {
+    POST_URL_STRUCT: '',
     POST_THUMBNAIL_URL_STRUCT: ''
   };
 
@@ -77,13 +78,14 @@
     }
     dialog = $('#find-posts');
     dialog.find('#find-posts-submit').unbind('click').bind('click', function(e) {
-      var input, label, selected;
+      var input, label, post_id, selected;
       e.preventDefault();
       input = dialog.find('[name="found_post_id"]:checked');
       if (input.size()) {
         label = dialog.find('label[for="' + input.attr('id') + '"]');
+        post_id = parseInt(input.val(), 10);
         selected = {
-          id: parseInt(input.val(), 10),
+          id: post_id,
           title: label.text()
         };
         $(this).unbind('click');
@@ -254,12 +256,14 @@
 
   attachPost = function() {
     return selectPost(function(post) {
-      var thumbUrl;
+      var postUrl, thumbUrl;
+      postUrl = wpLinksets.POST_URL_STRUCT.replace(/%post_id%/g, post.id);
       thumbUrl = wpLinksets.POST_THUMBNAIL_URL_STRUCT.replace(/%post_id%/g, post.id).replace(/%size%/g, 'thumbnail');
       return renderAttachment({
         type: 'post',
         id: post.id,
         title: post.title,
+        url: postUrl,
         thumb_url: thumbUrl
       });
     });

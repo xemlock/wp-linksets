@@ -2,6 +2,9 @@
   background: #eee;
   padding: 10px;
 }
+.linksets-initial {
+  padding: 8px 12px;
+}
 .wppl-thumb {
   border: 1px solid #ccc;
   width: 150px;
