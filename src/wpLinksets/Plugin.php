@@ -106,9 +106,12 @@ class Plugin
         add_action('edit_attachment', array($this, 'on_save_post'));
         add_action('add_attachment', array($this, 'on_save_post'));
 
-        add_action('the_post', array($this, 'on_post'));
+        add_action('the_post', array($this, 'on_the_post'));
 
         add_action('admin_enqueue_scripts', array($this, 'on_admin_enqueue_scripts'));
+
+        // this will be active if Timber is present
+        add_filter('get_twig', array($this, 'on_get_twig'));
     }
 
     public function on_admin_enqueue_scripts()
@@ -200,11 +203,23 @@ class Plugin
      * @param \WP_Post $post
      * @internal
      */
-    public function on_post(\WP_Post $post)
+    public function on_the_post(\WP_Post $post)
     {
         if ($this->is_enabled($post->post_type)) {
             $post->{self::POST_PROPERTY} = $this->get_linkset($post->ID);
         }
+    }
+
+    /**
+     * @param \Twig_Environment $twig
+     */
+    public function on_get_twig($twig)
+    {
+        if (class_exists('Twig_Environment') && $twig instanceof \Twig_Environment) {
+            $func = new \Twig_SimpleFunction('get_post_linkset', array($this, 'get_linkset'));
+            $twig->addFunction($func);
+        }
+        return $twig;
     }
 
     public function get_nonce()
@@ -224,7 +239,7 @@ class Plugin
             $post_id = get_post();
         }
 
-        if ($post_id instanceof \WP_Post) {
+        if (is_object($post_id) && isset($post_id->ID)) {
             $post_id = $post_id->ID;
         }
 

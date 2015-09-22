@@ -2,6 +2,11 @@
 
 namespace wpLinksets\Link;
 
+/**
+ * Class Url
+ *
+ * @property string $url
+ */
 class Url extends BaseLink
 {
     const TYPE = 'url';

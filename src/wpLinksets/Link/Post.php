@@ -2,6 +2,11 @@
 
 namespace wpLinksets\Link;
 
+/**
+ * Class Post
+ *
+ * @property-read \WP_Post $post
+ */
 class Post extends BaseLink
 {
     const TYPE = 'post';
@@ -44,26 +49,6 @@ class Post extends BaseLink
     }
 
     /**
-     * @param null $size
-     * @return string|false
-     */
-    public function get_thumb_url($size = null)
-    {
-        // try to retrieve thumbnail for this link, if that fails use
-        // post's thumbnail image
-        if (($thumb_url = parent::get_thumb_url($size)) !== false) {
-            return $thumb_url;
-        }
-        $post_thumbnail_id = get_post_thumbnail_id($this->_post->ID);
-        $img = wp_get_attachment_image_src($post_thumbnail_id, $size);
-        if ($img) {
-            // [0 => url, 1 => width, 2 => height]
-            return $img[0];
-        }
-        return false;
-    }
-
-    /**
      * @return \WP_Post
      */
     public function get_post()
@@ -92,5 +77,27 @@ class Post extends BaseLink
         $link = new static($id);
         $link->set_from_array($data);
         return $link;
+    }
+
+    /**
+     * @param mixed $size OPTIONAL
+     * @return \wpLinksets\Thumb\BaseThumb|null
+     */
+    public function get_thumb($size = null)
+    {
+        // try to load thumbnail from explicitly set thumbnail ID
+        if (($thumb = parent::get_thumb($size)) !== null) {
+            return $thumb;
+        }
+
+        $post_thumbnail_id = get_post_thumbnail_id($this->_post->ID);
+        if ($post_thumbnail_id) {
+            try {
+                return new \wpLinksets\Thumb\Thumb($post_thumbnail_id, $size);
+            } catch (\Exception $e) {
+            }
+        }
+
+        return null;
     }
 }

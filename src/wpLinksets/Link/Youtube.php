@@ -2,6 +2,12 @@
 
 namespace wpLinksets\Link;
 
+/**
+ * Class Youtube
+ *
+ * @property string $video_id
+ * @property-read string $embed_url
+ */
 class Youtube extends BaseLink
 {
     const TYPE = 'youtube';
@@ -13,6 +19,16 @@ class Youtube extends BaseLink
      * @var string
      */
     protected $_video_id;
+
+    /**
+     * @param string $video_id OPTIONAL
+     */
+    public function __construct($video_id = null)
+    {
+        if ($video_id !== null) {
+            $this->set_video_id($video_id);
+        }
+    }
 
     /**
      * @return string
@@ -43,24 +59,25 @@ class Youtube extends BaseLink
      */
     public function get_url()
     {
-        return sprintf('http://www.youtube.com/watch?v=%s', urlencode($this->_video_id));
+        return sprintf('https://www.youtube.com/watch?v=%s', urlencode($this->_video_id));
     }
 
-    /**
-     * @return string
-     */
-    public function get_thumb_url($size = null)
+    public function get_embed_url()
     {
-        $thumb_url = parent::get_thumb_url($size);
-        if ($thumb_url === false) {
-            // sizes:
-            // - default (120x90px)
-            // - mqdefault (320x180px)
-            // - hqdefault (480x360px)
-            // - sddefault (640x480px)
-            $thumb_url = sprintf('http://img.youtube.com/vi/%s/hqdefault.jpg', urlencode($this->_video_id));
+        return sprintf('https://www.youtube.com/embed/%s', urlencode($this->_video_id));
+    }
+
+    public function get_thumb($size = null)
+    {
+        if (($thumb = parent::get_thumb($size)) !== null) {
+            return $thumb;
         }
-        return $thumb_url;
+
+        if ($this->_video_id) {
+            return new \wpLinksets\Thumb\Youtube($this->_video_id);
+        }
+
+        return null;
     }
 
     /**

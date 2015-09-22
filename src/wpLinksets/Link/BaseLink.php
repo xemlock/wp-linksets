@@ -4,7 +4,15 @@ namespace wpLinksets\Link;
 
 /**
  * Class BaseLink
- * @package wpLinksets\Link
+ *
+ * @property string $type
+ * @property string $url
+ * @property string $title
+ * @property string $description
+ * @property string $date
+ * @property int $author_id
+ * @property int $thumb_id
+ * @property-read \wpLinksets\Thumb\BaseThumb|null $thumb
  */
 abstract class BaseLink
 {
@@ -119,6 +127,9 @@ abstract class BaseLink
     }
 
     /**
+     * Set thumbnail id. This effectively clears currently present
+     * thumbnail instance.
+     *
      * @param int|\WP_Post $image
      */
     public function set_thumb_id($thumb_id)
@@ -127,6 +138,7 @@ abstract class BaseLink
             $thumb_id = $thumb_id->ID;
         }
         $this->_thumb_id = (int) $thumb_id;
+        $this->_thumb = null;
     }
 
     /**
@@ -138,6 +150,22 @@ abstract class BaseLink
     }
 
     /**
+     * @param mixed $size OPTIONAL
+     * @return \wpLinksets\Thumb\BaseThumb|null
+     */
+    public function get_thumb($size = null)
+    {
+        // if thumbnail ID has been explicitly set, try to load it
+        if ($this->_thumb_id) {
+            try {
+                return new \wpLinksets\Thumb\Thumb($this->_thumb_id, $size);
+            } catch (\Exception $e) {
+            }
+        }
+        return null;
+    }
+
+    /**
      * The result depends on the value of the {@link get_thumb_id()} method
      *
      * @param  string|array $size
@@ -145,12 +173,7 @@ abstract class BaseLink
      */
     public function get_thumb_url($size = null)
     {
-        $img = wp_get_attachment_image_src((int) $this->get_thumb_id(), $size);
-        if ($img) {
-            // [0 => url, 1 => width, 2 => height]
-            return $img[0];
-        }
-        return false;
+        return ($thumb = $this->get_thumb($size)) ? $thumb->get_url() : false;
     }
 
     /**

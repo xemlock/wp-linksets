@@ -2,6 +2,9 @@
 
 namespace wpLinksets\Link;
 
+/**
+ * Class File
+ */
 class File extends Post
 {
     const TYPE = 'file';
@@ -23,21 +26,23 @@ class File extends Post
     }
 
     /**
-     * @param null $size
-     * @return string|false
+     * @param mixed $size OPTIONAL
+     * @return \wpLinksets\Thumb\BaseThumb|null
      */
-    public function get_thumb_url($size = null)
+    public function get_thumb($size = null)
     {
-        if (($thumb_url = parent::get_thumb_url($size)) !== false) {
-            return $thumb_url;
+        if (($thumb = parent::get_thumb($size)) !== null) {
+            return $thumb;
         }
-        // try to get thumbnail directly from the referenced file
-        $img = wp_get_attachment_image_src($this->_post->ID, $size);
-        if ($img) {
-            // [0 => url, 1 => width, 2 => height]
-            return $img[0];
+
+        // try to get thumbnail directly from the file - this will only
+        // succeed if file is an image
+        try {
+            return new \wpLinksets\Thumb\Thumb($this->_post->ID, $size);
+        } catch (\Exception $e) {
         }
-        return false;
+
+        return null;
     }
 
     /**
