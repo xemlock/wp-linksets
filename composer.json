@@ -14,10 +14,10 @@
     },
     "autoload": {
         "psr-0": {
-            "wpLinksets\\": "lib/"
+            "wpLinksets\\": "src/"
         },
         "files": [
-            "lib/functions.php",
+            "src/functions.php",
             "bootstrap.php"
         ]
     }
