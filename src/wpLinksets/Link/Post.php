@@ -67,6 +67,8 @@ class Post extends BaseLink
     }
 
     /**
+     * {@inheritDoc}
+     *
      * @param array $data
      * @return Post
      */
@@ -80,6 +82,8 @@ class Post extends BaseLink
     }
 
     /**
+     * {@inheritDoc}
+     *
      * @param mixed $size OPTIONAL
      * @return \wpLinksets\Thumb\BaseThumb|null
      */

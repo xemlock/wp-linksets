@@ -20,12 +20,17 @@ class File extends Post
         }
     }
 
+    /**
+     * @return string
+     */
     public function get_url()
     {
         return wp_get_attachment_url($this->_post->ID);
     }
 
     /**
+     * {@inheritDoc}
+     *
      * @param mixed $size OPTIONAL
      * @return \wpLinksets\Thumb\BaseThumb|null
      */
@@ -46,6 +51,8 @@ class File extends Post
     }
 
     /**
+     * {@inheritDoc}
+     *
      * @return array
      */
     public function get_js_data()
