@@ -4,6 +4,8 @@ namespace wpLinksets\Link;
 
 /**
  * Class File
+ *
+ * @property-read string $path
  */
 class File extends Post
 {
@@ -18,6 +20,16 @@ class File extends Post
         if ($this->_post->post_type !== 'attachment') {
             throw new \InvalidArgumentException(sprintf('Invalid file ID (%d)', $this->_post->ID));
         }
+    }
+
+    /**
+     * Get file path
+     *
+     * @return string
+     */
+    public function get_path()
+    {
+        return get_attached_file($this->_post->ID);
     }
 
     /**

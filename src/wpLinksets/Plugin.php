@@ -203,8 +203,11 @@ class Plugin
      * @param \WP_Post $post
      * @internal
      */
-    public function on_the_post(\WP_Post $post)
+    public function on_the_post($post)
     {
+        if (!$post instanceof \WP_Post) {
+            return;
+        }
         if ($this->is_enabled($post->post_type)) {
             $post->{self::POST_PROPERTY} = $this->get_linkset($post->ID);
         }
