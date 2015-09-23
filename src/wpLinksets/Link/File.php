@@ -5,42 +5,32 @@ namespace wpLinksets\Link;
 /**
  * Class File
  *
- * @property-read string $path
- * @property-read int $size
+ * @property-read \wpLinksets\File $file
  */
 class File extends Post
 {
     const TYPE = 'file';
 
     /**
+     * @var \wpLinksets\File
+     */
+    protected $_file;
+
+    /**
      * @param int $id
      */
     public function __construct($id)
     {
-        parent::__construct($id);
-        if ($this->_post->post_type !== 'attachment') {
-            throw new \InvalidArgumentException(sprintf('Invalid file ID (%d)', $this->_post->ID));
-        }
+        $this->_file = new \wpLinksets\File($id);
+        parent::__construct($this->_file->get_post());
     }
 
     /**
-     * Get file path
-     *
-     * @return string
+     * @return \wpLinksets\File
      */
-    public function get_path()
+    public function get_file()
     {
-        return get_attached_file($this->_post->ID);
-    }
-
-    /**
-     * Get file size
-     *
-     * @return int
-     */
-    public function get_size()
-    {
-        return filesize($this->get_path());
+        return $this->_file;
     }
 
     /**
@@ -48,7 +38,7 @@ class File extends Post
      */
     public function get_url()
     {
-        return wp_get_attachment_url($this->_post->ID);
+        return $this->_file->get_url();
     }
 
     /**
@@ -81,7 +71,7 @@ class File extends Post
     public function get_js_data()
     {
         $data = parent::get_js_data();
-        $data['file'] = wp_prepare_attachment_for_js($this->_post);
+        $data['file'] = $this->_file->get_js_data();
         return $data;
     }
 }

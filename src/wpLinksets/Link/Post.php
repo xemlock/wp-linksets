@@ -22,8 +22,10 @@ class Post extends BaseLink
      */
     public function __construct($id)
     {
-        if (is_int($id) || ctype_digit($id)) {
-            /** @var \WP_Post $post */
+        /** @var \WP_Post $post */
+        if ($id instanceof \WP_Post) {
+            $post = $id;
+        } elseif (is_int($id) || ctype_digit($id)) {
             $post = get_post($id);
         }
         if (empty($post)) {
