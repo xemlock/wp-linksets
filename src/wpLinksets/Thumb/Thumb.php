@@ -49,7 +49,7 @@ class Thumb extends BaseThumb
     }
 
     /**
-     * Get thumbnail URL
+     * {@inheritDoc}
      *
      * @return string
      */
@@ -59,7 +59,7 @@ class Thumb extends BaseThumb
     }
 
     /**
-     * Get thumbnail width
+     * {@inheritDoc}
      *
      * @return int
      */
@@ -69,7 +69,7 @@ class Thumb extends BaseThumb
     }
 
     /**
-     * Get thumbnail height
+     * {@inheritDoc}
      *
      * @return int
      */

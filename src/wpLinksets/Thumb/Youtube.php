@@ -21,6 +21,8 @@ class Youtube extends BaseThumb
     }
 
     /**
+     * Get YouTube Video ID of this thumbnail
+     *
      * @return string
      */
     public function get_video_id()
@@ -29,6 +31,8 @@ class Youtube extends BaseThumb
     }
 
     /**
+     * {@inheritDoc}
+     *
      * @param string $size OPTIONAL
      * @return string
      */
@@ -47,11 +51,21 @@ class Youtube extends BaseThumb
         return $thumb_url;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return int
+     */
     public function get_width()
     {
         return 480;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return int
+     */
     public function get_height()
     {
         return 360;

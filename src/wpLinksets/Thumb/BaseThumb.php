@@ -15,16 +15,22 @@ abstract class BaseThumb
     const ORIENTATION_PORTRAIT  = 'portrait';
 
     /**
+     * Get thumbnail URL
+     *
      * @return string
      */
     abstract public function get_url();
 
     /**
+     * Get thumbnail width
+     *
      * @return int
      */
     abstract public function get_width();
 
     /**
+     * Get thumbnail height
+     *
      * @return int
      */
     abstract public function get_height();
@@ -63,12 +69,12 @@ abstract class BaseThumb
     }
 
     /**
-     * Return thumbnail URL
+     * Proxy to {@link get_url()}
      *
      * @return string
      */
     public function __toString()
     {
-        return $this->_url;
+        return $this->get_url();
     }
 }
