@@ -6,6 +6,7 @@ namespace wpLinksets\Link;
  * Class File
  *
  * @property-read string $path
+ * @property-read int $size
  */
 class File extends Post
 {
@@ -30,6 +31,16 @@ class File extends Post
     public function get_path()
     {
         return get_attached_file($this->_post->ID);
+    }
+
+    /**
+     * Get file size
+     *
+     * @return int
+     */
+    public function get_size()
+    {
+        return filesize($this->get_path());
     }
 
     /**
