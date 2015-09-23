@@ -212,6 +212,14 @@ formatDate = (date) ->
     _f = (x) ->
         if x < 10 then '0' + String(x) else String(x)
 
+    # when selecting file that was just uploaded WordPress 4.3.1
+    # provides dates as UNIX timestamps - we need to handle those
+
+    if typeof date == 'number'
+        d = new Date
+        d.setTime(date)
+        date = d
+
     day = _f date.getDate()
     month = _f (date.getMonth() + 1)
     year = date.getFullYear()
