@@ -265,11 +265,11 @@
 
 .linkset-item-thumb-actions {
     position: absolute;
-    bottom: -(
+    bottom: -(ceil(
         @thumb-action-padding-top + @thumb-action-padding-bottom +
         @thumb-action-font-size * @thumb-action-line-height +
         @thumb-action-icon-size
-    );
+    ));
     left: 0;
     width: 100%;
     color: #fff;
