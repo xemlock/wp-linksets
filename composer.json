@@ -10,7 +10,7 @@
     ],
     "require": {
         "php": ">=5.3.0",
-        "xemlock/wp-unified-post-thumbnail-url": "dev-master"
+        "xemlock/wp-post-thumbnail-endpoint": "dev-master"
     },
     "autoload": {
         "psr-0": {
