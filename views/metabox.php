@@ -14,7 +14,10 @@
     wpLinksets.POST_URL_STRUCT = <?php echo wp_json_encode(get_site_url() . '/?p=%post_id%') ?>;
     wpLinksets.POST_THUMBNAIL_URL_STRUCT = <?php echo wp_json_encode(get_site_url() . get_post_thumbnail_endpoint_structure()) ?>;
     wpLinksets.messages.selectFile = <?php echo wp_json_encode(__('Select file')) ?>;
-    wpLinksets.linkset = <?php echo wp_json_encode($this->get_linkset($post)->get_js_data()) ?>;
+    jQuery(function () {
+        var data = <?php echo wp_json_encode($this->get_linkset($post)->get_js_data()) ?>;
+        wpLinksets.init('#post-attachments-metabox', data);
+    });
 </script>
 
 <script type="text/html" id="tmpl-wpPostAttachments-find-posts">
@@ -23,7 +26,7 @@
 
 <script type="text/html" id="tmpl-wpPostAttachments-main">
     <div class="linkset-container no-items">
-        <ul id="wpPostAttachments-list" class="linkset-list">
+        <ul id="wpPostAttachments-list" class="linkset-list" data-role="linkset-list">
         </ul>
         <p class="linkset-empty">
             <?php echo __('No links. Add links using the buttons below') ?>

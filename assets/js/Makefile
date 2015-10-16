@@ -4,7 +4,7 @@ ALL = main.js
 
 all: $(ALL)
 
-%.js: %.coffee
+%.js: %.litcoffee
 	coffee -o $(dir $@) --compile $<
 	uglifyjs $@ --output $@.tmp
 	mv -f $@.tmp $@
