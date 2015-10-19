@@ -172,10 +172,11 @@ class Plugin
                 }
             }
 
-            // update_post_meta() fails to handle JSON encoded UTF-8 characters,
-            // so linkset is serialized via serialize()
-            $meta = serialize($linkset->to_array());
-            update_post_meta($post_id, self::META_KEY, $meta);
+            // don't serialize (or JSON encode) meta explicitly, because the
+            // meta value will be stripped of backslashes. That will lead to
+            // corrupted data (unserializable string or corrupted UTF-8 chars)
+            // $meta = serialize($linkset->to_array());
+            update_post_meta($post_id, self::META_KEY, $linkset->to_array());
 
             $post->{self::POST_PROPERTY} = $linkset;
         }
@@ -246,12 +247,11 @@ class Plugin
             $post_id = $post_id->ID;
         }
 
-        $meta = get_post_meta((int) $post_id, self::META_KEY, true);
-        $data = unserialize($meta);
+        $data = get_post_meta((int) $post_id, self::META_KEY, true);
 
         if (!is_array($data) && function_exists('json_decode')) {
             // backwards compatibility
-            $data = (array) json_decode($meta, true);
+            $data = (array) json_decode($data, true);
         }
 
         $linkset = new Linkset();
