@@ -247,11 +247,20 @@ class Plugin
             $post_id = $post_id->ID;
         }
 
-        $data = get_post_meta((int) $post_id, self::META_KEY, true);
+        $meta = get_post_meta((int) $post_id, self::META_KEY, true);
 
-        if (!is_array($data) && function_exists('json_decode')) {
-            // backwards compatibility
-            $data = (array) json_decode($data, true);
+        if (is_array($meta)) {
+            $data = $meta;
+        } else {
+            // Meta that was not serialized by update_post_meta(), even
+            // if it was provided as a serialized value, will not be
+            // automatically unserialized - why?
+            $data = maybe_unserialize($meta);
+
+            // For backwards compatibility check for data in JSON format
+            if (!is_array($data) && function_exists('json_decode')) {
+                $data = (array) json_decode($data, true);
+            }
         }
 
         $linkset = new Linkset();
