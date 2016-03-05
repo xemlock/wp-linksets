@@ -46,7 +46,7 @@ class Youtube extends BaseThumb
         // - maxresdefault (1920x1080px)
         // The higher resolution thumbnails are not guaranteed to exist
         $video_id = $this->_video_id;
-        $thumb_url = sprintf('http://img.youtube.com/vi/%s/hqdefault.jpg', urlencode($video_id));
+        $thumb_url = sprintf('https://img.youtube.com/vi/%s/hqdefault.jpg', urlencode($video_id));
 
         return $thumb_url;
     }
