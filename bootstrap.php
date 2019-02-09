@@ -10,10 +10,9 @@
  * License:     MIT
  */
 
-defined('ABSPATH') || die();
-
-if (file_exists($autoload = __DIR__ . '/vendor/autoload.php')) {
-    require_once $autoload;
+if (defined('ABSPATH')) {
+    if (file_exists($autoload = __DIR__ . '/vendor/autoload.php')) {
+        require_once $autoload;
+    }
+    wpLinksets\Plugin::start();
 }
-
-wpLinksets\Plugin::start();
