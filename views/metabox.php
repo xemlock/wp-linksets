@@ -25,6 +25,7 @@
 </script>
 
 <script type="text/html" id="tmpl-wpPostAttachments-main">
+    <input type="hidden" name="<?php echo $this::REQUEST_GUARD ?>" value="1" />
     <div class="linkset-container no-items">
         <ul id="wpPostAttachments-list" class="linkset-list" data-role="linkset-list">
         </ul>

@@ -6,6 +6,7 @@ class Plugin
 {
     const FEATURE_KEY   = 'linksets';
     const REQUEST_KEY   = 'linkset';
+    const REQUEST_GUARD = 'linkset_metabox';
     const META_KEY      = '_linkset';
     const POST_PROPERTY = 'post_linkset';
 
@@ -148,6 +149,10 @@ class Plugin
      */
     public function on_save_post($post_id)
     {
+        if (empty($_POST[self::REQUEST_GUARD])) {
+            return;
+        }
+
         // Don't update metadata when auto saving post
         // http://wordpress.stackexchange.com/questions/14282/custom-post-type-metabox-not-saving
         if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
@@ -160,10 +165,11 @@ class Plugin
 
         $post = get_post($post_id);
 
-        if ($post && $this->is_enabled($post->post_type) && isset($_POST[self::REQUEST_KEY])) {
+        if ($post && $this->is_enabled($post->post_type)) {
+            $linkset_data = isset($_POST[self::REQUEST_KEY]) ? $_POST[self::REQUEST_KEY] : array();
             $linkset = new Linkset();
 
-            foreach ((array) $_POST[self::REQUEST_KEY] as $data) {
+            foreach ((array) $linkset_data as $data) {
                 try {
                     $link = $this->_link_factory->create_link($data);
                     $linkset->add($link);
