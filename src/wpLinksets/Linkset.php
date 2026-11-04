@@ -48,6 +48,7 @@ class Linkset implements \Countable, \ArrayAccess, \IteratorAggregate
     /**
      * @return int
      */
+    #[\ReturnTypeWillChange]
     public function count()
     {
         return count($this->_items);
@@ -57,6 +58,7 @@ class Linkset implements \Countable, \ArrayAccess, \IteratorAggregate
      * @param midex $offset
      * @return Link\BaseLink|null
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($offset)
     {
         return isset($this->_items[$offset]) ? $this->_items[$offset] : null;
@@ -68,6 +70,7 @@ class Linkset implements \Countable, \ArrayAccess, \IteratorAggregate
      * @throws \OutOfBoundsException
      * @throws \InvalidArgumentException
      */
+    #[\ReturnTypeWillChange]
     public function offsetSet($offset, $item)
     {
         if (!$item instanceof Link\BaseLink) {
@@ -83,6 +86,7 @@ class Linkset implements \Countable, \ArrayAccess, \IteratorAggregate
      * @param mixed $offset
      * @return bool
      */
+    #[\ReturnTypeWillChange]
     public function offsetExists($offset)
     {
         return isset($this->_items[$offset]);
@@ -91,6 +95,7 @@ class Linkset implements \Countable, \ArrayAccess, \IteratorAggregate
     /**
      * @param mixed $offset
      */
+    #[\ReturnTypeWillChange]
     public function offsetUnset($offset)
     {
         unset($this->_items[$offset]);
@@ -99,6 +104,7 @@ class Linkset implements \Countable, \ArrayAccess, \IteratorAggregate
     /**
      * @return \ArrayIterator|\Traversable
      */
+    #[\ReturnTypeWillChange]
     public function getIterator()
     {
         return new \ArrayIterator($this->_items);
