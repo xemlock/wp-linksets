@@ -112,7 +112,7 @@ class Plugin
         add_action('admin_enqueue_scripts', array($this, 'on_admin_enqueue_scripts'));
 
         // this will be active if Timber is present
-        add_filter('get_twig', array($this, 'on_get_twig'));
+        add_filter('timber/twig', array($this, 'on_get_twig'));
     }
 
     public function on_admin_enqueue_scripts()
@@ -221,14 +221,15 @@ class Plugin
     }
 
     /**
-     * @param \Twig_Environment $twig
+     * @param \Twig\Environment $twig
      */
     public function on_get_twig($twig)
     {
-        if (class_exists('Twig_Environment') && $twig instanceof \Twig_Environment) {
-            $func = new \Twig_SimpleFunction('get_post_linkset', array($this, 'get_linkset'));
-            $twig->addFunction($func);
-        }
+        // Namespaced classes were introduced in Twig 1.34.0 and 2.4.0 as aliases to Twig_ classes.
+        $func = class_exists('Twig\TwigFunction')
+            ? new \Twig\TwigFunction('get_post_linkset', array($this, 'get_linkset'))
+            : new \Twig_SimpleFunction('get_post_linkset', array($this, 'get_linkset'));
+        $twig->addFunction($func);
         return $twig;
     }
 
